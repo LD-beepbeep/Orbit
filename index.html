@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ORBIT</title>
+    <title>ORBIT SiteBox OS</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,11 +14,11 @@
             --text-color: #ffffff;
             --accent: #0A84FF; /* Apple Blue */
             --danger: #FF453A;
-            --card-width: 160px; /* Iets kleiner voor mobiel */
-            --card-height: 100px;
+            --card-width: 140px; /* Small enough for 2 columns on mobile (320px+) */
+            --card-height: 90px;
         }
 
-        /* Mobiele optimalisaties */
+        /* Desktop optimalisaties */
         @media (min-width: 768px) {
             :root { --card-width: 240px; --card-height: 140px; }
         }
@@ -39,17 +39,10 @@
             padding-bottom: 40px;
         }
 
-        /* --- CLOCK --- */
-        .os-clock {
-            position: absolute; top: 15px; left: 20px;
-            font-size: 1.1rem; font-weight: 600; color: rgba(255,255,255,0.8);
-            z-index: 20;
-        }
-
         /* --- NAVBAR --- */
         .orbit-nav {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            background: rgba(28, 28, 30, 0.65); backdrop-filter: blur(25px);
+            background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(25px);
             padding: 4px; border-radius: 100px; display: flex;
             align-items: center; gap: 2px; z-index: 100;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
@@ -66,7 +59,24 @@
         .header-controls {
             width: 100%; max-width: 800px; display: flex; flex-direction: column; 
             align-items: center; gap: 15px; margin-bottom: 10px; z-index: 10; position: relative;
-            padding: 0 20px; margin-top: 10px;
+            padding: 0 20px; margin-top: 20px;
+        }
+
+        /* LOGO STYLES */
+        .site-branding {
+            display: flex; flex-direction: column; align-items: center; margin-bottom: 5px;
+        }
+        .site-logo-img {
+            height: 60px; width: auto; object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+            transition: transform 0.3s;
+        }
+        .site-logo-img:hover { transform: scale(1.05); }
+        .site-title-text {
+            font-size: 2rem; font-weight: 800; letter-spacing: -1px;
+            background: linear-gradient(to bottom, #fff, #aaa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .edit-toggle {
@@ -75,7 +85,6 @@
             background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.2s; color: #ccc;
         }
-        .edit-toggle:hover { background: rgba(255,255,255,0.2); color: white; }
         .edit-toggle.active { background: var(--accent); color: white; }
 
         /* --- SEARCH --- */
@@ -100,8 +109,13 @@
         /* --- GRID --- */
         .app-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
-            gap: 30px 20px; padding: 20px; width: 100%; max-width: 1200px;
+            gap: 20px 15px; padding: 15px; width: 100%; max-width: 1200px;
             perspective: 1200px; padding-bottom: 100px;
+        }
+        
+        /* More padding on desktop */
+        @media(min-width: 768px) {
+            .app-grid { padding: 40px; gap: 30px 20px; }
         }
 
         .app-item { display: flex; flex-direction: column; align-items: center; position: relative; transition: 0.3s; }
@@ -139,11 +153,16 @@
         .app-card:active { transform: scale(0.96); }
 
         .app-content { transform: translateZ(20px); pointer-events: none; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .app-icon-fa { font-size: 40px; color: white; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
-        .app-icon-img { width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+        .app-icon-fa { font-size: 32px; color: white; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+        .app-icon-img { width: 50px; height: 50px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+        
+        @media(min-width: 768px) {
+            .app-icon-fa { font-size: 40px; }
+            .app-icon-img { width: 60px; height: 60px; }
+        }
 
         .app-label {
-            margin-top: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.8); font-weight: 500;
+            margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.8); font-weight: 500;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
         }
@@ -157,8 +176,20 @@
         @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
         .section-title { font-size: 12px; text-transform: uppercase; color: #666; font-weight: 700; margin-bottom: 10px; letter-spacing: 1px; }
         .tmdb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
-        .movie-card { border-radius: 12px; overflow: hidden; cursor: pointer; position: relative; }
+        .movie-card { border-radius: 12px; overflow: hidden; cursor: pointer; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .movie-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: #222; }
+
+        /* Watchlist Remove Button */
+        .watchlist-remove {
+            position: absolute; top: 5px; right: 5px;
+            width: 28px; height: 28px;
+            background: rgba(255, 69, 58, 0.9); /* Red background */
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: transform 0.2s; z-index: 10;
+        }
+        .watchlist-remove:hover { transform: scale(1.1); background: #ff3b30; }
 
         /* --- MODALS --- */
         .modal-overlay {
@@ -231,8 +262,6 @@
 </head>
 <body>
 
-    <div class="os-clock" id="clock">--:--</div>
-
     <!-- Nav -->
     <nav class="orbit-nav">
         <div class="nav-item active" id="nav-home" onclick="switchTab('home')">Home</div>
@@ -243,6 +272,16 @@
 
     <!-- Header -->
     <div class="header-controls">
+        
+        <!-- LOGO SECTION -->
+        <div class="site-branding">
+            <!-- Option 1: Image Logo (Uncomment below and change src to 'assets/logo.png') -->
+            <!-- <img src="logo.png" class="site-logo-img" alt="Orbit Logo"> -->
+            
+            <!-- Option 2: Text Logo (Default) -->
+            <div class="site-title-text">ORBIT <span style="color:var(--accent); -webkit-text-fill-color: var(--accent);">OS</span></div>
+        </div>
+
         <div class="search-wrapper">
             <i class="fa-solid fa-search search-icon"></i>
             <input type="text" class="search-input" id="searchInput" placeholder="Search..." onkeyup="handleSearch()">
@@ -352,13 +391,6 @@
             watchlist = savedWatch ? JSON.parse(savedWatch) : [];
 
             renderGrid();
-            setInterval(updateClock, 1000);
-            updateClock();
-        }
-
-        function updateClock() {
-            // English time format
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
         }
 
         // --- APP LAUNCHER (CAPACITOR READY) ---
@@ -526,18 +558,19 @@
             list.innerHTML = '';
             modal.classList.add('active');
 
-            const wlBtn = document.createElement('div');
-            wlBtn.className = 'action-btn';
-            wlBtn.style.justifyContent = 'center';
-            wlBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add to Watchlist';
-            wlBtn.onclick = () => { 
-                if(!watchlist.some(i=>i.id===item.id)) {
+            // Only show add button if NOT in watchlist
+            if (!watchlist.some(i => i.id === item.id)) {
+                const wlBtn = document.createElement('div');
+                wlBtn.className = 'action-btn';
+                wlBtn.style.justifyContent = 'center';
+                wlBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add to Watchlist';
+                wlBtn.onclick = () => { 
                     watchlist.push(item);
                     localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
-                }
-                modal.classList.remove('active');
-            };
-            list.appendChild(wlBtn);
+                    modal.classList.remove('active');
+                };
+                list.appendChild(wlBtn);
+            }
 
             try {
                 const url = `https://api.themoviedb.org/3/${item.media_type}/${item.id}/watch/providers?api_key=${TMDB_KEY}`;
@@ -589,11 +622,16 @@
                 card.innerHTML = `<img src="${poster}" class="movie-poster">`;
                 card.onclick = () => checkAvailability(item);
                 
-                // Remove X
+                // Clear Trashcan Button
                 const x = document.createElement('div');
+                x.className = 'watchlist-remove';
                 x.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                x.style.cssText = "position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); color:white; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:10px;";
-                x.onclick = (e) => { e.stopPropagation(); watchlist.splice(index,1); localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist)); renderWatchlist(); };
+                x.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    watchlist.splice(index,1); 
+                    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist)); 
+                    renderWatchlist(); 
+                };
                 
                 card.appendChild(x);
                 grid.appendChild(card);
