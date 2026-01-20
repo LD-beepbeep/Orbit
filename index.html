@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ORBIT SiteBox OS</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #ffffff;
+            --accent: #0A84FF; /* Apple Blue */
+            --danger: #FF453A;
+            --card-width: 160px; /* Iets kleiner voor mobiel */
+            --card-height: 100px;
+        }
+
+        /* Mobiele optimalisaties */
+        @media (min-width: 768px) {
+            :root { --card-width: 240px; --card-height: 140px; }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1c1c1e 0%, #000000 100%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding-top: 60px; 
+            padding-bottom: 40px;
+        }
+
+        /* --- CLOCK --- */
+        .os-clock {
+            position: absolute; top: 15px; left: 20px;
+            font-size: 1.1rem; font-weight: 600; color: rgba(255,255,255,0.8);
+            z-index: 20;
+        }
+
+        /* --- NAVBAR --- */
+        .orbit-nav {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+            background: rgba(28, 28, 30, 0.65); backdrop-filter: blur(25px);
+            padding: 4px; border-radius: 100px; display: flex;
+            align-items: center; gap: 2px; z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-item {
+            padding: 8px 16px; border-radius: 100px; color: rgba(255,255,255,0.6);
+            font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: 0.3s;
+        }
+        .nav-item:hover { color: white; }
+        .nav-item.active { background: rgba(255,255,255,0.15); color: white; font-weight: 600; }
+
+        /* --- CONTROLS --- */
+        .header-controls {
+            width: 100%; max-width: 800px; display: flex; flex-direction: column; 
+            align-items: center; gap: 15px; margin-bottom: 10px; z-index: 10; position: relative;
+            padding: 0 20px; margin-top: 10px;
+        }
+
+        .edit-toggle {
+            position: absolute; right: 20px; top: 0;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s; color: #ccc;
+        }
+        .edit-toggle:hover { background: rgba(255,255,255,0.2); color: white; }
+        .edit-toggle.active { background: var(--accent); color: white; }
+
+        /* --- SEARCH --- */
+        .search-wrapper { position: relative; width: 100%; max-width: 500px; }
+        
+        .search-input {
+            width: 100%; padding: 14px 45px 14px 50px; border-radius: 18px;
+            border: 1px solid var(--glass-border); background: rgba(30, 30, 35, 0.5);
+            backdrop-filter: blur(20px); color: white; font-size: 1rem; outline: none;
+            transition: 0.3s;
+        }
+        .search-input:focus { background: rgba(50, 50, 55, 0.8); border-color: rgba(255,255,255,0.3); }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.3); }
+        .search-clear {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            color: rgba(255,255,255,0.4); cursor: pointer; display: none;
+            width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1);
+            align-items: center; justify-content: center; font-size: 0.7rem;
+        }
+        .search-clear.visible { display: flex; }
+
+        /* --- GRID --- */
+        .app-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
+            gap: 30px 20px; padding: 20px; width: 100%; max-width: 1200px;
+            perspective: 1200px; padding-bottom: 100px;
+        }
+
+        .app-item { display: flex; flex-direction: column; align-items: center; position: relative; transition: 0.3s; }
+        .app-item.hidden { display: none; }
+
+        /* Edit Mode */
+        body.edit-mode .app-item:not(.add-btn) .app-card { animation: shake 0.25s infinite alternate ease-in-out; pointer-events: none; }
+        @keyframes shake { 0% { transform: rotate(-1deg); } 100% { transform: rotate(1deg); } }
+
+        .delete-badge {
+            position: absolute; top: -8px; left: -8px; width: 24px; height: 24px;
+            background: var(--danger); color: white; border-radius: 50%;
+            display: none; align-items: center; justify-content: center; font-size: 12px;
+            cursor: pointer; z-index: 50; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            animation: popIn 0.2s;
+        }
+        
+        /* Alleen tonen in edit mode EN als er NIET gezocht wordt */
+        body.edit-mode:not(.is-searching) .app-item:not(.add-btn) .delete-badge { display: flex; }
+        
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+        .app-card {
+            width: 100%; height: var(--card-height); background: var(--glass-bg);
+            border-radius: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.15s, box-shadow 0.3s; transform-style: preserve-3d;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* Only hover effect on desktop to avoid stuck hover on mobile */
+        @media (hover: hover) {
+            .app-card:hover { transform: scale(1.03); box-shadow: 0 15px 40px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.2); }
+        }
+        .app-card:active { transform: scale(0.96); }
+
+        .app-content { transform: translateZ(20px); pointer-events: none; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .app-icon-fa { font-size: 40px; color: white; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+        .app-icon-img { width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+
+        .app-label {
+            margin-top: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.8); font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+        }
+
+        .add-card { border: 2px dashed rgba(255,255,255,0.2); background: rgba(255, 255, 255, 0.03); }
+        .add-card .app-icon-fa { font-size: 24px; color: rgba(255,255,255,0.3); }
+
+        /* --- TMDB --- */
+        .tmdb-section { width: 100%; max-width: 1200px; padding: 0 20px; margin-bottom: 30px; display: none; }
+        .tmdb-section.active { display: block; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        .section-title { font-size: 12px; text-transform: uppercase; color: #666; font-weight: 700; margin-bottom: 10px; letter-spacing: 1px; }
+        .tmdb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
+        .movie-card { border-radius: 12px; overflow: hidden; cursor: pointer; position: relative; }
+        .movie-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: #222; }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
+            z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-window {
+            background: #1c1c1e; border-radius: 20px; padding: 30px; width: 100%; max-width: 400px;
+            text-align: center; box-shadow: 0 20px 50px black; border: 1px solid #333;
+        }
+        .modal-title { font-size: 1.3rem; margin-bottom: 5px; font-weight: 700; color: white; }
+        .modal-subtitle { color: #888; margin-bottom: 20px; font-size: 0.9rem; }
+
+        .btn-list { display: flex; flex-direction: column; gap: 8px; max-height: 40vh; overflow-y: auto; }
+        .action-btn {
+            background: #2c2c2e; padding: 12px 16px; border-radius: 12px;
+            display: flex; align-items: center; gap: 12px; cursor: pointer; color: white;
+        }
+        .action-btn:active { background: #3a3a3c; }
+        .action-btn img, .action-btn i { width: 24px; height: 24px; object-fit: contain; text-align: center; font-size: 1.1rem; }
+        .action-btn span { font-weight: 500; font-size: 0.95rem; flex: 1; text-align: left; }
+
+        /* Inputs & Buttons */
+        .input-group { margin-bottom: 10px; text-align: left; }
+        .input-field {
+            width: 100%; padding: 12px; background: #2c2c2e; border: none;
+            border-radius: 10px; color: white; outline: none; font-size: 16px; /* Prevents iOS zoom */
+        }
+        .btn { padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; font-size: 1rem; width: 100%; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-ghost { background: transparent; color: var(--accent); margin-top: 10px; }
+
+        /* FLUID GLASS IFRAME WINDOW */
+        .iframe-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 2000; display: none; flex-direction: column;
+        }
+        .iframe-container.active { display: flex; }
+        
+        .iframe-header {
+            height: 60px; /* Taller for easier tapping */
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; padding-top: env(safe-area-inset-top);
+            /* Fluid Glass Look */
+            background: rgba(20, 20, 20, 0.6); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+        }
+        .iframe-title { font-weight: 600; font-size: 15px; color: white; opacity: 0.9; }
+        
+        .win-btn { 
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 1rem; cursor: pointer; 
+            background: rgba(255,255,255,0.1); transition: 0.2s;
+        }
+        .win-btn:active { background: rgba(255,255,255,0.3); }
+        .win-btn.close { background: rgba(255, 59, 48, 0.2); color: #ff3b30; }
+
+        iframe { 
+            flex: 1; border: none; background: #000; 
+            padding-top: 60px; /* Space for absolute header */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="os-clock" id="clock">--:--</div>
+
+    <!-- Nav -->
+    <nav class="orbit-nav">
+        <div class="nav-item active" id="nav-home" onclick="switchTab('home')">Home</div>
+        <div class="nav-item" id="nav-video" onclick="switchTab('video')">Video</div>
+        <div class="nav-item" id="nav-music" onclick="switchTab('music')">Audio</div>
+        <div class="nav-item" id="nav-watchlist" onclick="switchTab('watchlist')">List</div>
+    </nav>
+
+    <!-- Header -->
+    <div class="header-controls">
+        <div class="search-wrapper">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search..." onkeyup="handleSearch()">
+            <div class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        
+        <div class="edit-toggle" id="editBtn" onclick="toggleEditMode()">
+            <i class="fa-solid fa-pen"></i>
+        </div>
+    </div>
+
+    <!-- TMDB Results -->
+    <div class="tmdb-section" id="tmdbSection">
+        <div class="section-title">Results</div>
+        <div class="tmdb-grid" id="tmdbGrid"></div>
+    </div>
+
+    <!-- App Grid -->
+    <div class="app-grid" id="appGrid"></div>
+
+    <!-- Watchlist Grid -->
+    <div class="app-grid" id="watchlistGrid" style="display: none;"></div>
+
+    <!-- Fluid Glass App Window -->
+    <div class="iframe-container" id="iframeContainer">
+        <div class="iframe-header">
+            <div class="win-btn close" onclick="closeWindow()"><i class="fa-solid fa-xmark"></i></div>
+            <div class="iframe-title" id="winTitle">App</div>
+            <div class="win-btn" onclick="openExternal()"><i class="fa-regular fa-compass"></i></div>
+        </div>
+        <iframe id="appFrame" src=""></iframe>
+    </div>
+
+    <!-- Watch Options Modal -->
+    <div class="modal-overlay" id="watchModal">
+        <div class="modal-window">
+            <div class="modal-title" id="movieTitle">Title</div>
+            <div class="modal-subtitle" id="movieSub">Checking availability...</div>
+            <div class="btn-list" id="watchList"></div>
+            <button class="btn btn-ghost" onclick="document.getElementById('watchModal').classList.remove('active')">Close</button>
+        </div>
+    </div>
+
+    <!-- Add App Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-window">
+            <div class="modal-title">Add App</div>
+            <div class="input-group"><input type="text" class="input-field" id="newAppName" placeholder="Name"></div>
+            <div class="input-group"><input type="text" class="input-field" id="newAppUrl" placeholder="URL (https://...)"></div>
+            <div class="input-group">
+                <select class="input-field" id="newAppCat">
+                    <option value="video">Video</option>
+                    <option value="music">Audio</option>
+                    <option value="social">Social</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="confirmAddApp()">Save</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('addModal').classList.remove('active')">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // API KEY HARDCODED
+        const TMDB_KEY = "18edc53b83356fd207e31e8aa4821280"; 
+        const STORAGE_KEY = "orbit_apps_final";
+        const WATCHLIST_KEY = "orbit_watchlist_final";
+        
+        // --- DATA ---
+        const library = [
+            { name: "Google", category: "other", url: "https://www.google.com", color: "#4285F4", iconClass: "fa-brands fa-google", searchPattern: "https://www.google.com/search?q=%q" },
+            { name: "VRT MAX", category: "video", url: "https://www.vrt.be/vrtmax/", color: "#ff5a00", iconClass: "fa-solid fa-play", searchPattern: "https://www.vrt.be/vrtnu/zoeken/?q=%q" },
+            { name: "VTM GO", category: "video", url: "https://vtm.be/vtmgo", color: "#f39200", iconClass: "fa-solid fa-tv", searchPattern: "https://vtm.be/vtmgo/zoeken?query=%q" },
+            { name: "GoPlay", category: "video", url: "https://www.goplay.be", color: "#000000", iconClass: "fa-solid fa-circle-play", searchPattern: "https://www.goplay.be/zoeken?q=%q" },
+            { name: "Streamz", category: "video", url: "https://www.streamz.be", color: "#FF3333", iconClass: "fa-solid fa-clapperboard", searchPattern: "https://www.streamz.be/zoeken?q=%q" },
+            { name: "YouTube", category: "video", url: "https://www.youtube.com", color: "#FF0000", iconClass: "fa-brands fa-youtube", searchPattern: "https://www.youtube.com/results?search_query=%q" },
+            { name: "Netflix", category: "video", url: "https://www.netflix.com", color: "#E50914", iconClass: "fa-solid fa-film", searchPattern: "https://www.netflix.com/search?q=%q" },
+            { name: "Disney+", category: "video", url: "https://www.disneyplus.com", color: "#113CCF", iconClass: "fa-solid fa-star", searchPattern: "https://www.disneyplus.com/search?q=%q" },
+            { name: "Prime Video", category: "video", url: "https://www.primevideo.com", color: "#00A8E1", iconClass: "fa-brands fa-amazon", searchPattern: "https://www.primevideo.com/search/ref=atv_nb_sr?phrase=%q" },
+            { name: "Twitch", category: "video", url: "https://www.twitch.tv", color: "#9146FF", iconClass: "fa-brands fa-twitch", searchPattern: "https://www.twitch.tv/search?term=%q" },
+            { name: "Spotify", category: "music", url: "https://open.spotify.com", color: "#1DB954", iconClass: "fa-brands fa-spotify", searchPattern: "https://open.spotify.com/search/%q" },
+            { name: "Apple Music", category: "music", url: "https://music.apple.com", color: "#FA243C", iconClass: "fa-brands fa-apple", searchPattern: "https://music.apple.com/us/search?term=%q" },
+            { name: "SoundCloud", category: "music", url: "https://soundcloud.com", color: "#ff5500", iconClass: "fa-brands fa-soundcloud", searchPattern: "https://soundcloud.com/search?q=%q" },
+            { name: "Amazon", category: "shopping", url: "https://www.amazon.com.be", color: "#FF9900", iconClass: "fa-brands fa-amazon", searchPattern: "https://www.amazon.com.be/s?k=%q" },
+            { name: "Bol.com", category: "shopping", url: "https://www.bol.com", color: "#0000FF", iconClass: "fa-solid fa-shop", searchPattern: "https://www.bol.com/be/nl/s/?searchtext=%q" }
+        ];
+
+        const providerMap = {
+            "Netflix": "Netflix", "Disney Plus": "Disney+", "Amazon Prime Video": "Prime Video",
+            "Apple TV Plus": "Apple TV+", "Streamz": "Streamz", "VTM GO": "VTM GO", "VRT MAX": "VRT MAX"
+        };
+
+        let myApps = [];
+        let watchlist = [];
+        let isEditMode = false;
+        let currentTab = 'home';
+        let currentActiveAppUrl = '';
+
+        function init() {
+            // Load Apps
+            const savedApps = localStorage.getItem(STORAGE_KEY);
+            myApps = savedApps ? JSON.parse(savedApps) : [...library];
+            if (!savedApps) localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+
+            // Load Watchlist
+            const savedWatch = localStorage.getItem(WATCHLIST_KEY);
+            watchlist = savedWatch ? JSON.parse(savedWatch) : [];
+
+            renderGrid();
+            setInterval(updateClock, 1000);
+            updateClock();
+        }
+
+        function updateClock() {
+            // English time format
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+        }
+
+        // --- APP LAUNCHER (CAPACITOR READY) ---
+        async function openWindow(app) {
+            currentActiveAppUrl = app.url;
+            
+            const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+
+            if (isNative) {
+                // APP MODE
+                try {
+                    await Capacitor.Plugins.Browser.open({ 
+                        url: app.url,
+                        toolbarColor: '#000000',
+                        presentationStyle: 'fullscreen'
+                    });
+                } catch (e) {
+                    console.error("Browser plugin failed", e);
+                    window.open(app.url, '_blank');
+                }
+            } else {
+                // WEB MODE
+                document.getElementById('winTitle').innerText = app.name;
+                document.getElementById('appFrame').src = app.url;
+                document.getElementById('iframeContainer').classList.add('active');
+            }
+        }
+
+        function closeWindow() {
+            document.getElementById('iframeContainer').classList.remove('active');
+            setTimeout(() => { document.getElementById('appFrame').src = ''; }, 300);
+        }
+
+        function openExternal() {
+            if(currentActiveAppUrl) window.open(currentActiveAppUrl, '_blank');
+        }
+
+        // --- RENDERING ---
+        function renderGrid() {
+            const grid = document.getElementById('appGrid');
+            grid.innerHTML = '';
+            
+            let filterCat = 'all';
+            if (currentTab === 'video') filterCat = 'video';
+            if (currentTab === 'music') filterCat = 'music';
+
+            const visibleApps = myApps.filter(a => filterCat === 'all' || a.category === filterCat);
+
+            visibleApps.forEach((app) => {
+                const realIndex = myApps.indexOf(app);
+                const item = document.createElement('div');
+                item.className = 'app-item';
+                
+                const card = document.createElement('div');
+                card.className = 'app-card';
+                card.style.backgroundColor = app.color;
+                
+                let icon = app.img ? `<img src="${app.img}" class="app-icon-img">` : `<i class="${app.iconClass} app-icon-fa"></i>`;
+                card.innerHTML = `<div class="app-content">${icon}</div>`;
+                
+                card.onclick = () => { if(!isEditMode) openWindow(app); };
+
+                // Delete Button
+                const delBtn = document.createElement('div');
+                delBtn.className = 'delete-badge';
+                delBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                delBtn.onclick = (e) => { e.stopPropagation(); removeApp(realIndex); };
+
+                item.appendChild(delBtn);
+                item.appendChild(card);
+                item.appendChild(makeLabel(app.name));
+                grid.appendChild(item);
+            });
+
+            // Add Button
+            const addItem = document.createElement('div');
+            addItem.className = 'app-item add-btn';
+            addItem.innerHTML = `<div class="app-card add-card" onclick="openAddModal()"><div class="app-content"><i class="fa-solid fa-plus" style="font-size:30px; opacity:0.5;"></i></div></div><div class="app-label">Add</div>`;
+            grid.appendChild(addItem);
+        }
+
+        function makeLabel(txt) { const d = document.createElement('div'); d.className='app-label'; d.innerText=txt; return d; }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${tab === 'all' ? 'home' : tab}`).classList.add('active');
+
+            const appGrid = document.getElementById('appGrid');
+            const watchGrid = document.getElementById('watchlistGrid');
+            const tmdb = document.getElementById('tmdbSection');
+
+            tmdb.classList.remove('active');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchClear').classList.remove('visible');
+            document.body.classList.remove('is-searching'); 
+
+            if (tab === 'watchlist') {
+                appGrid.style.display = 'none';
+                watchGrid.style.display = 'grid';
+                renderWatchlist();
+            } else {
+                appGrid.style.display = 'grid';
+                watchGrid.style.display = 'none';
+                renderGrid();
+            }
+        }
+
+        // --- SEARCH ---
+        let searchTimer;
+        function handleSearch() {
+            clearTimeout(searchTimer);
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const isSearching = q.length > 0;
+            
+            document.getElementById('searchClear').classList.toggle('visible', isSearching);
+            document.body.classList.toggle('is-searching', isSearching);
+
+            document.querySelectorAll('.app-item:not(.add-btn)').forEach(el => {
+                const name = el.innerText.toLowerCase();
+                el.style.display = name.includes(q) ? 'flex' : 'none';
+            });
+
+            if(q.length > 2) {
+                searchTimer = setTimeout(() => fetchTMDB(q), 500);
+            } else {
+                document.getElementById('tmdbSection').classList.remove('active');
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            handleSearch();
+        }
+
+        async function fetchTMDB(q) {
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&language=en-US&query=${encodeURIComponent(q)}`);
+            const data = await res.json();
+            const results = (data.results || []).filter(i => ['movie', 'tv'].includes(i.media_type)).slice(0, 6);
+            
+            const grid = document.getElementById('tmdbGrid');
+            grid.innerHTML = '';
+            
+            if(results.length > 0) {
+                document.getElementById('tmdbSection').classList.add('active');
+                results.forEach(item => {
+                    const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : null;
+                    if(!poster) return;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'movie-card';
+                    card.innerHTML = `<img src="${poster}" class="movie-poster">`;
+                    card.onclick = () => checkAvailability(item);
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // --- WATCHLIST & AVAILABILITY ---
+        async function checkAvailability(item) {
+            const modal = document.getElementById('watchModal');
+            const list = document.getElementById('watchList');
+            document.getElementById('movieTitle').innerText = item.title || item.name;
+            document.getElementById('movieSub').innerText = "Checking availability...";
+            list.innerHTML = '';
+            modal.classList.add('active');
+
+            const wlBtn = document.createElement('div');
+            wlBtn.className = 'action-btn';
+            wlBtn.style.justifyContent = 'center';
+            wlBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add to Watchlist';
+            wlBtn.onclick = () => { 
+                if(!watchlist.some(i=>i.id===item.id)) {
+                    watchlist.push(item);
+                    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+                }
+                modal.classList.remove('active');
+            };
+            list.appendChild(wlBtn);
+
+            try {
+                const url = `https://api.themoviedb.org/3/${item.media_type}/${item.id}/watch/providers?api_key=${TMDB_KEY}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                // Check Belgium + US
+                const providers = (data.results?.BE?.flatrate || []).concat(data.results?.US?.flatrate || []);
+                
+                let matches = [];
+                providers.forEach(p => {
+                    const mapName = providerMap[p.provider_name];
+                    if(mapName) {
+                        const userApp = myApps.find(a => a.name === mapName);
+                        if(userApp) matches.push(userApp);
+                    }
+                });
+                matches = [...new Set(matches)];
+
+                const divider = document.createElement('div');
+                divider.style.margin = "10px 0 5px 0"; divider.style.fontSize="10px"; divider.style.color="#666"; 
+                divider.innerText = matches.length > 0 ? "AVAILABLE ON:" : "SEARCH MANUALLY:";
+                list.appendChild(divider);
+
+                const targets = matches.length > 0 ? matches : myApps.filter(a => a.category === 'video' && a.searchPattern);
+                
+                targets.forEach(app => {
+                    const searchLink = app.searchPattern.replace('%q', encodeURIComponent(item.title || item.name));
+                    const btn = document.createElement('div');
+                    btn.className = 'action-btn';
+                    let icon = app.img ? `<img src="${app.img}">` : `<i class="${app.iconClass}" style="color:${app.color}"></i>`;
+                    btn.innerHTML = `${icon} <span>${app.name}</span> <i class="fa-solid fa-chevron-right" style="font-size:0.8rem; opacity:0.5;"></i>`;
+                    btn.onclick = () => {
+                        openWindow({ name: app.name, url: searchLink });
+                        modal.classList.remove('active');
+                    };
+                    list.appendChild(btn);
+                });
+
+            } catch(e) { console.error(e); }
+        }
+
+        function renderWatchlist() {
+            const grid = document.getElementById('watchlistGrid');
+            grid.innerHTML = '';
+            watchlist.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : null;
+                card.innerHTML = `<img src="${poster}" class="movie-poster">`;
+                card.onclick = () => checkAvailability(item);
+                
+                // Remove X
+                const x = document.createElement('div');
+                x.innerHTML = '<i class="fa-solid fa-trash"></i>';
+                x.style.cssText = "position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); color:white; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:10px;";
+                x.onclick = (e) => { e.stopPropagation(); watchlist.splice(index,1); localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist)); renderWatchlist(); };
+                
+                card.appendChild(x);
+                grid.appendChild(card);
+            });
+        }
+
+        // --- MANAGING APPS ---
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.body.classList.toggle('edit-mode');
+            document.getElementById('editBtn').classList.toggle('active');
+        }
+        function removeApp(index) {
+            myApps.splice(index, 1);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+            renderGrid();
+        }
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+            document.getElementById('newAppName').value = '';
+            document.getElementById('newAppUrl').value = '';
+        }
+        function confirmAddApp() {
+            const name = document.getElementById('newAppName').value;
+            const url = document.getElementById('newAppUrl').value;
+            const cat = document.getElementById('newAppCat').value;
+            
+            if(!name || !url) return;
+
+            // Auto-detect known services from library for better icons/colors
+            const libMatch = library.find(l => l.name.toLowerCase() === name.toLowerCase());
+            
+            const newApp = {
+                name, url, category: cat,
+                color: libMatch ? libMatch.color : '#333',
+                iconClass: libMatch ? libMatch.iconClass : 'fa-solid fa-globe',
+                searchPattern: libMatch ? libMatch.searchPattern : null
+            };
+            myApps.push(newApp);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+            renderGrid();
+            document.getElementById('addModal').classList.remove('active');
+        }
+
+        init();
+    </script>
+</body>
+</html>
