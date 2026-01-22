@@ -3,26 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>ORBIT</title>
     
+    <!-- Fullscreen / PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiT3JiaXQgT1MiLCJzaG9ydF9uYW1lIjoiT3JiaXQiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwidGhlbWVfY29sb3IiOiIjMDAwMDAwIn0=">
+
+    <title>ORBIT SiteBox OS</title>
     <!-- Icons & Sortable Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    
     <style>
         :root {
             --bg-dark: #000000;
             --glass-bg: rgba(30, 30, 35, 0.4);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-color: #ffffff;
-            --accent: #0A84FF;
+            --accent: #0A84FF; /* Default Blue */
             --danger: #FF453A;
             --success: #30d158;
             --card-width: 155px; 
             --card-height: 100px;
-            --radius-l: 24px;
-            --safe-top: env(safe-area-inset-top, 24px); /* Increased default safe area */
+            --radius-l: 26px;
+            --safe-top: env(safe-area-inset-top, 24px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
+            
+            /* Theme Colors */
+            --theme-home: #0A84FF;
+            --theme-video: #5E5CE6;
+            --theme-music: #30D158;
+            --theme-list: #FF9F0A;
         }
 
         /* Mobile adjustments */
@@ -33,12 +44,12 @@
                 --radius-l: 22px;
             }
             .orbit-nav {
-                width: 94%; 
+                width: 96% !important; /* Wider on mobile */
                 justify-content: space-between;
-                padding: 5px;
+                padding: 4px;
             }
             .nav-item {
-                padding: 8px 0 !important;
+                padding: 10px 0 !important;
                 font-size: 0.85rem !important;
                 flex: 1;
                 text-align: center;
@@ -66,7 +77,7 @@
             min-height: 100vh;
             display: flex; flex-direction: column; align-items: center;
             overflow-x: hidden;
-            padding-top: calc(var(--safe-top) + 90px); 
+            padding-top: calc(var(--safe-top) + 60px); 
             padding-bottom: calc(var(--safe-bottom) + 60px);
             transition: background 1s ease;
         }
@@ -92,7 +103,7 @@
 
         /* --- NAVBAR (HIGHER) --- */
         .orbit-nav {
-            position: fixed; top: calc(var(--safe-top) + 30px); /* Tucked right under status bar */
+            position: fixed; top: calc(var(--safe-top) + 10px);
             left: 50%; transform: translateX(-50%);
             background: rgba(22, 22, 24, 0.85); 
             backdrop-filter: blur(50px) saturate(180%); -webkit-backdrop-filter: blur(50px) saturate(180%);
@@ -108,11 +119,12 @@
         .nav-item {
             padding: 10px 24px; border-radius: 100px; color: rgba(255,255,255,0.55);
             font-size: 0.9rem; font-weight: 600; cursor: pointer; 
-            transition: all 0.25s ease;
+            transition: all 0.3s ease;
         }
         .nav-item.active { 
             background: rgba(255,255,255,0.15); color: white; 
             box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+            /* Dynamic Accent Color applied via JS */
         }
 
         /* --- HEADER CONTROLS --- */
@@ -125,14 +137,15 @@
         .header-btn {
             width: 44px; height: 44px; border-radius: 50%;
             background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.1rem; cursor: pointer; transition: 0.2s;
+            color: white; font-size: 1.1rem; cursor: pointer; transition: 0.3s;
             backdrop-filter: blur(10px);
         }
         .header-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
+        .header-btn.settings-active { color: var(--accent); background: rgba(255,255,255,0.15); }
 
         /* DONE BUTTON (Edit Mode) */
         .done-btn {
-            position: fixed; top: calc(var(--safe-top) + 35px); right: 24px;
+            position: fixed; top: calc(var(--safe-top) + 15px); right: 24px;
             background: white; color: black;
             padding: 8px 24px; border-radius: 100px; font-weight: 700; font-size: 0.9rem;
             cursor: pointer; z-index: 2000; display: none;
@@ -156,7 +169,7 @@
         }
         .search-input:focus { 
             background: rgba(55, 55, 60, 0.8); 
-            border-color: rgba(255,255,255,0.25); 
+            border-color: var(--accent); 
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); font-size: 1.1rem; }
@@ -168,10 +181,10 @@
         }
         .search-clear.visible { display: flex; }
 
-        /* --- RECENTS (NEW FEATURE) --- */
+        /* --- RECENTS --- */
         .recents-container {
             width: 100%; max-width: 1400px; padding: 0 24px; margin-bottom: 10px;
-            display: none; /* Hidden if empty */
+            display: none; 
         }
         .recents-title {
             font-size: 0.8rem; color: rgba(255,255,255,0.4); text-transform: uppercase; 
@@ -180,7 +193,7 @@
         .recents-scroll {
             display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;
             scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
-            padding-left: 5px; /* Visual balance */
+            padding-left: 5px; 
         }
         .recents-scroll::-webkit-scrollbar { display: none; }
         
@@ -260,6 +273,11 @@
         .add-card:active { background: rgba(255,255,255,0.08); }
         .add-card .app-icon-fa { font-size: 26px; color: rgba(255,255,255,0.4); }
 
+        /* Fallback Search Card */
+        .search-web-card { background: rgba(66, 133, 244, 0.2); border: 1px solid #4285F4; }
+        .search-web-card .app-icon-fa { color: #4285F4; }
+        .search-web-card .app-label { color: #8ab4f8; }
+
         /* Onboarding Styles */
         .app-card.selected {
             border: 2px solid var(--accent);
@@ -285,6 +303,24 @@
         .movie-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: #1a1a1a; display: block; }
 
         /* Watchlist UI */
+        .watchlist-controls {
+            width: 100%; max-width: 1400px; padding: 0 24px; margin-bottom: 15px;
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;
+        }
+        .filter-chip {
+            padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 20px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer; color: rgba(255,255,255,0.7);
+            white-space: nowrap; transition: 0.2s; border: 1px solid transparent;
+        }
+        .filter-chip.active { background: var(--accent); color: white; }
+        
+        .wl-action {
+             width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1);
+             display: flex; align-items: center; justify-content: center; cursor: pointer;
+             margin-left: auto; color: white;
+        }
+        .wl-action:active { transform: scale(0.9); background: var(--accent); }
+
         .empty-watchlist {
             grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 80px 20px; text-align: center; opacity: 0.5;
@@ -314,7 +350,7 @@
         .toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.offline { border-color: var(--danger); }
 
-        /* --- MODALS (PREMIUM) --- */
+        /* --- MODALS --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.01); 
             backdrop-filter: blur(0px); transition: all 0.4s ease;
@@ -346,6 +382,7 @@
         .action-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
         .action-btn img, .action-btn i { width: 30px; height: 30px; object-fit: contain; text-align: center; font-size: 1.3rem; }
         .action-btn span { font-weight: 600; font-size: 1rem; flex: 1; text-align: left; }
+        .action-value { color: #888; font-size: 0.9rem; margin-left: auto; }
 
         /* Inputs & Buttons */
         .input-group { margin-bottom: 16px; text-align: left; position: relative; }
@@ -367,15 +404,11 @@
         .btn-ghost { background: transparent; color: rgba(255,255,255,0.6); margin-top: 15px; font-weight: 600; }
 
         /* Preview Card in Add Modal */
-        .preview-container {
-            margin-bottom: 25px; display: flex; justify-content: center;
-        }
+        .preview-container { margin-bottom: 25px; display: flex; justify-content: center; }
         .preview-card {
-            width: 100px; height: 100px; /* Square for preview look */
-            background: var(--glass-bg); border-radius: 24px;
+            width: 100px; height: 100px; background: var(--glass-bg); border-radius: 24px;
             display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.4);
             transform: scale(1.1); transition: all 0.3s;
         }
         .preview-icon { width: 50px; height: 50px; object-fit: contain; }
@@ -405,10 +438,7 @@
         iframe { flex: 1; border: none; background: #000; padding-top: 60px; }
 
         /* Onboarding Compact Grid */
-        #onboardingGrid {
-            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); 
-            gap: 12px;
-        }
+        #onboardingGrid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 12px; }
         #onboardingGrid .app-item { touch-action: auto !important; }
         #onboardingGrid .app-card { height: 75px; border-radius: 16px; }
         #onboardingGrid .app-icon-fa { font-size: 28px; }
@@ -468,13 +498,22 @@
             <input type="text" class="search-input" id="searchInput" placeholder="Search..." onkeyup="handleSearch()">
             <div class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></div>
         </div>
-        <div class="header-btn" onclick="toggleEditMode()"><i class="fa-solid fa-pen"></i></div>
+        <!-- Phantom element to balance layout -->
+        <div style="width:44px;"></div>
     </div>
 
     <!-- Recent Apps Section -->
     <div class="recents-container" id="recentsContainer">
         <div class="recents-title">Recently Opened</div>
         <div class="recents-scroll" id="recentsScroll"></div>
+    </div>
+    
+    <!-- Watchlist Controls -->
+    <div class="watchlist-controls" id="watchlistControls" style="display: none;">
+        <div class="filter-chip active" onclick="filterWatchlist('all')">All</div>
+        <div class="filter-chip" onclick="filterWatchlist('movie')">Movies</div>
+        <div class="filter-chip" onclick="filterWatchlist('tv')">TV</div>
+        <div class="wl-action" onclick="shuffleWatch()" title="Pick random"><i class="fa-solid fa-shuffle"></i></div>
     </div>
 
     <!-- TMDB Results -->
@@ -523,6 +562,11 @@
                 <div class="action-btn" onclick="clearRecents()">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>Clear Recents</span>
+                </div>
+                <div class="action-btn" style="cursor: default;">
+                     <i class="fa-solid fa-hard-drive"></i>
+                     <span>Storage</span>
+                     <span class="action-value" id="storageStats">0 KB</span>
                 </div>
                 <div class="action-btn" onclick="resetApp()" style="color:var(--danger)">
                     <i class="fa-solid fa-rotate-right"></i>
@@ -671,6 +715,7 @@
         let currentTab = 'home';
         let currentActiveAppUrl = '';
         let sortable; 
+        let wlFilter = 'all';
         
         let selectedOnboardingApps = [];
         let confirmCallback = null;
@@ -740,13 +785,9 @@
 
         // --- RECENTS ---
         function addToRecents(app) {
-            // Remove duplicates
             recents = recents.filter(r => r.url !== app.url);
-            // Add to start
             recents.unshift(app);
-            // Limit to 5
             if(recents.length > 5) recents.pop();
-            
             localStorage.setItem(RECENTS_KEY, JSON.stringify(recents));
             renderRecents();
         }
@@ -765,9 +806,7 @@
             recents.forEach(app => {
                 const div = document.createElement('div');
                 div.className = 'recent-item';
-                
                 let icon = app.img ? `<img src="${app.img}">` : `<i class="${app.iconClass}"></i>`;
-                
                 div.innerHTML = `
                     <div class="recent-icon" style="background:${app.color}">${icon}</div>
                     <div class="recent-label">${app.name}</div>
@@ -786,6 +825,13 @@
 
         // --- SETTINGS ---
         function openSettings() {
+            // Update storage stats
+            let total = 0;
+            for(let x in localStorage) {
+                if(localStorage.hasOwnProperty(x)) total += (localStorage[x].length * 2);
+            }
+            document.getElementById('storageStats').innerText = (total / 1024).toFixed(2) + " KB";
+            
             document.getElementById('settingsModal').classList.add('active');
         }
 
@@ -931,6 +977,11 @@
             if (currentTab === 'music') filterCat = 'music';
 
             const visibleApps = myApps.filter(a => filterCat === 'all' || a.category === filterCat);
+            
+            // Add Smart Search button if no apps
+            if (visibleApps.length === 0 && filterCat === 'all' && myApps.length === 0) {
+                 // Empty state handled by grid logic naturally, or add placeholder here
+            }
 
             visibleApps.forEach((app) => {
                 const realIndex = myApps.indexOf(app);
@@ -1013,9 +1064,17 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`nav-${tab === 'all' ? 'home' : tab}`).classList.add('active');
 
+            // Apply Theme Color
+            const r = document.querySelector(':root');
+            if(tab === 'home' || tab === 'all') r.style.setProperty('--accent', 'var(--theme-home)');
+            else if(tab === 'video') r.style.setProperty('--accent', 'var(--theme-video)');
+            else if(tab === 'music') r.style.setProperty('--accent', 'var(--theme-music)');
+            else if(tab === 'watchlist') r.style.setProperty('--accent', 'var(--theme-list)');
+
             const appGrid = document.getElementById('appGrid');
             const watchGrid = document.getElementById('watchlistGrid');
             const tmdb = document.getElementById('tmdbSection');
+            const wlControls = document.getElementById('watchlistControls');
 
             tmdb.classList.remove('active');
             document.getElementById('searchInput').value = '';
@@ -1027,10 +1086,12 @@
             if (tab === 'watchlist') {
                 appGrid.style.display = 'none';
                 watchGrid.style.display = 'grid';
+                wlControls.style.display = 'flex';
                 renderWatchlist();
             } else {
                 appGrid.style.display = 'grid';
                 watchGrid.style.display = 'none';
+                wlControls.style.display = 'none';
                 renderGrid();
             }
         }
@@ -1055,6 +1116,9 @@
             } else {
                 document.getElementById('tmdbSection').classList.remove('active');
             }
+            
+            // Smart Search Fallback (Show Google Card if no results)
+            // Implementation note: This is tricky with current dom structure without a redraw, sticking to visual only for now.
         }
 
         function clearSearch() {
@@ -1084,7 +1148,7 @@
             }
         }
 
-        // --- WATCHLIST ---
+        // --- WATCHLIST & AVAILABILITY ---
         async function checkAvailability(item) {
             const modal = document.getElementById('watchModal');
             const list = document.getElementById('watchList');
@@ -1151,22 +1215,45 @@
             } catch(e) { console.error(e); }
         }
 
+        // --- WATCHLIST FEATURES ---
+        function filterWatchlist(type) {
+            wlFilter = type;
+            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            renderWatchlist();
+        }
+
+        function shuffleWatch() {
+            if(watchlist.length === 0) return;
+            const randomItem = watchlist[Math.floor(Math.random() * watchlist.length)];
+            checkAvailability(randomItem);
+        }
+
         function renderWatchlist() {
             const grid = document.getElementById('watchlistGrid');
             grid.innerHTML = '';
+            
+            let filtered = watchlist;
+            if(wlFilter !== 'all') {
+                filtered = watchlist.filter(item => item.media_type === wlFilter || (wlFilter === 'movie' && !item.media_type));
+            }
 
-            if (watchlist.length === 0) {
+            // Always new first
+            filtered = [...filtered].reverse();
+
+            if (filtered.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-watchlist">
                         <i class="fa-solid fa-film empty-icon"></i>
-                        <div class="empty-text">Your list is empty</div>
-                        <div class="empty-sub">Search for movies or shows to add them.</div>
+                        <div class="empty-text">Nothing here</div>
+                        <div class="empty-sub">Try changing filters or search to add items.</div>
                     </div>
                 `;
                 return;
             }
 
-            watchlist.forEach((item, index) => {
+            filtered.forEach((item) => {
+                const originalIndex = watchlist.indexOf(item);
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : null;
@@ -1179,7 +1266,7 @@
                 x.onclick = (e) => { 
                     e.stopPropagation(); 
                     openConfirmModal(() => {
-                        watchlist.splice(index,1); 
+                        watchlist.splice(originalIndex,1); 
                         localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist)); 
                         renderWatchlist(); 
                     });
