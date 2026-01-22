@@ -20,7 +20,7 @@
             --glass-bg: rgba(30, 30, 35, 0.4);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-color: #ffffff;
-            --accent: #0A84FF; /* Default Blue */
+            --accent: #0A84FF;
             --danger: #FF453A;
             --success: #30d158;
             --card-width: 155px; 
@@ -44,7 +44,7 @@
                 --radius-l: 22px;
             }
             .orbit-nav {
-                width: 96% !important; /* Wider on mobile */
+                width: 98% !important; /* Wider on mobile */
                 justify-content: space-between;
                 padding: 4px;
             }
@@ -59,7 +59,7 @@
                 gap: 15px !important;
             }
             .header-controls {
-                margin-top: 5px !important;
+                margin-top: 10px !important;
                 padding-top: 0 !important;
             }
             .search-wrapper { max-width: 100% !important; }
@@ -77,29 +77,11 @@
             min-height: 100vh;
             display: flex; flex-direction: column; align-items: center;
             overflow-x: hidden;
-            padding-top: calc(var(--safe-top) + 60px); 
+            /* Adjusted padding since status bar is gone */
+            padding-top: calc(var(--safe-top) + 80px); 
             padding-bottom: calc(var(--safe-bottom) + 60px);
             transition: background 1s ease;
         }
-
-        /* --- STATUS BAR (CLEAN) --- */
-        .status-bar {
-            position: fixed; top: 0; left: 0; right: 0;
-            height: calc(var(--safe-top) + 20px);
-            padding: var(--safe-top) 24px 0 24px;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 2000; pointer-events: none;
-            font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.9);
-            background: transparent;
-        }
-
-        .status-left { display: flex; align-items: center; }
-        .status-time { letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
-        
-        .status-right { display: flex; align-items: center; gap: 8px; }
-        .battery-level { display: flex; align-items: center; gap: 4px; }
-        .battery-icon { font-size: 1.1rem; opacity: 0.9; }
-        #wifiIcon { font-size: 1rem; }
 
         /* --- NAVBAR (HIGHER) --- */
         .orbit-nav {
@@ -124,14 +106,13 @@
         .nav-item.active { 
             background: rgba(255,255,255,0.15); color: white; 
             box-shadow: 0 2px 15px rgba(0,0,0,0.2);
-            /* Dynamic Accent Color applied via JS */
         }
 
         /* --- HEADER CONTROLS --- */
         .header-controls {
             width: 100%; max-width: 900px; display: flex; align-items: center; gap: 15px; 
             margin-bottom: 10px; z-index: 10; position: relative;
-            padding: 0 24px; margin-top: 10px;
+            padding: 0 24px; margin-top: 15px;
         }
 
         .header-btn {
@@ -141,8 +122,17 @@
             backdrop-filter: blur(10px);
         }
         .header-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
-        .header-btn.settings-active { color: var(--accent); background: rgba(255,255,255,0.15); }
+        /* Dynamic color for settings icon */
+        .header-btn i { color: var(--accent); transition: color 0.3s ease; }
 
+        /* Clock Widget */
+        .header-clock {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.9); font-weight: 600; line-height: 1.1;
+            margin-right: auto; /* Push search to right if needed, or remove if using flex gap */
+            display: none; /* Hidden by default, shown via flex in layout */
+        }
+        
         /* DONE BUTTON (Edit Mode) */
         .done-btn {
             position: fixed; top: calc(var(--safe-top) + 15px); right: 24px;
@@ -269,14 +259,13 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
         }
 
+        /* Zen Mode */
+        body.zen-mode .app-label { display: none; }
+        body.zen-mode .app-grid { gap: 15px; }
+
         .add-card { border: 2px dashed rgba(255,255,255,0.15); background: rgba(255, 255, 255, 0.02); }
         .add-card:active { background: rgba(255,255,255,0.08); }
         .add-card .app-icon-fa { font-size: 26px; color: rgba(255,255,255,0.4); }
-
-        /* Fallback Search Card */
-        .search-web-card { background: rgba(66, 133, 244, 0.2); border: 1px solid #4285F4; }
-        .search-web-card .app-icon-fa { color: #4285F4; }
-        .search-web-card .app-label { color: #8ab4f8; }
 
         /* Onboarding Styles */
         .app-card.selected {
@@ -404,11 +393,15 @@
         .btn-ghost { background: transparent; color: rgba(255,255,255,0.6); margin-top: 15px; font-weight: 600; }
 
         /* Preview Card in Add Modal */
-        .preview-container { margin-bottom: 25px; display: flex; justify-content: center; }
+        .preview-container {
+            margin-bottom: 25px; display: flex; justify-content: center;
+        }
         .preview-card {
-            width: 100px; height: 100px; background: var(--glass-bg); border-radius: 24px;
+            width: 100px; height: 100px; /* Square for preview look */
+            background: var(--glass-bg); border-radius: 24px;
             display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
             transform: scale(1.1); transition: all 0.3s;
         }
         .preview-icon { width: 50px; height: 50px; object-fit: contain; }
@@ -438,7 +431,10 @@
         iframe { flex: 1; border: none; background: #000; padding-top: 60px; }
 
         /* Onboarding Compact Grid */
-        #onboardingGrid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 12px; }
+        #onboardingGrid {
+            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); 
+            gap: 12px;
+        }
         #onboardingGrid .app-item { touch-action: auto !important; }
         #onboardingGrid .app-card { height: 75px; border-radius: 16px; }
         #onboardingGrid .app-icon-fa { font-size: 28px; }
@@ -468,20 +464,6 @@
     <!-- Done Button (Edit Mode) -->
     <div class="done-btn" onclick="disableEditMode()">Done</div>
 
-    <!-- Status Bar (Clean) -->
-    <div class="status-bar" id="statusBar">
-        <div class="status-left">
-            <span class="status-time" id="statusClock">12:00</span>
-        </div>
-        <div class="status-right">
-            <div id="wifiIcon"><i class="fa-solid fa-wifi"></i></div>
-            <div class="battery-level" id="batteryContainer" style="display:none;">
-                <span id="batteryPercent">100%</span>
-                <i class="fa-solid fa-battery-full battery-icon" id="batteryIcon"></i>
-            </div>
-        </div>
-    </div>
-
     <!-- Nav -->
     <nav class="orbit-nav">
         <div class="nav-item active" id="nav-home" onclick="switchTab('home')">Home</div>
@@ -498,8 +480,11 @@
             <input type="text" class="search-input" id="searchInput" placeholder="Search..." onkeyup="handleSearch()">
             <div class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></div>
         </div>
-        <!-- Phantom element to balance layout -->
-        <div style="width:44px;"></div>
+        <!-- Clock Widget in Header -->
+        <div class="header-clock" id="headerClock">
+            <div style="font-size: 0.9rem;" id="miniTime">12:00</div>
+            <div style="font-size: 0.7rem; opacity: 0.7;" id="miniDate">Mon 1</div>
+        </div>
     </div>
 
     <!-- Recent Apps Section -->
@@ -558,6 +543,11 @@
                     <i class="fa-solid fa-earth-americas"></i>
                     <span>Force External Browser</span>
                     <i class="fa-solid fa-toggle-off" id="toggleExternal"></i>
+                </div>
+                 <div class="action-btn" onclick="toggleZenMode()">
+                    <i class="fa-solid fa-eye-slash"></i>
+                    <span>Zen Mode</span>
+                    <i class="fa-solid fa-toggle-off" id="toggleZen"></i>
                 </div>
                 <div class="action-btn" onclick="clearRecents()">
                     <i class="fa-solid fa-clock-rotate-left"></i>
@@ -710,7 +700,7 @@
         let myApps = [];
         let watchlist = [];
         let recents = [];
-        let settings = { forceExternal: false };
+        let settings = { forceExternal: false, zenMode: false };
         let isEditMode = false;
         let currentTab = 'home';
         let currentActiveAppUrl = '';
@@ -738,41 +728,37 @@
             renderRecents();
 
             const savedSettings = localStorage.getItem(SETTINGS_KEY);
-            if(savedSettings) settings = JSON.parse(savedSettings);
+            if(savedSettings) {
+                settings = JSON.parse(savedSettings);
+                if(settings.zenMode) document.body.classList.add('zen-mode');
+            }
             updateSettingsUI();
 
-            setupStatus();
-            setInterval(setupStatus, 60000); 
+            setupClock();
+            setInterval(setupClock, 60000); 
+
             window.addEventListener('offline', () => toggleWifi(false));
             window.addEventListener('online', () => toggleWifi(true));
+            
+            // Add App by long press background
+            document.addEventListener('contextmenu', (e) => {
+                if(!e.target.closest('.app-card') && !isEditMode) {
+                    e.preventDefault();
+                    if(confirm("Add new app?")) openAddModal();
+                }
+            });
         }
-
-        function setupStatus() {
+        
+        function setupClock() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
-            document.getElementById('statusClock').innerText = timeStr;
-
-            if ('getBattery' in navigator) {
-                navigator.getBattery().then(bat => {
-                    updateBattery(bat);
-                    bat.addEventListener('levelchange', () => updateBattery(bat));
-                    bat.addEventListener('chargingchange', () => updateBattery(bat));
-                });
-            }
-        }
-
-        function updateBattery(bat) {
-            const cont = document.getElementById('batteryContainer');
-            const icon = document.getElementById('batteryIcon');
-            const pct = Math.round(bat.level * 100);
-            cont.style.display = 'flex';
-            document.getElementById('batteryPercent').innerText = pct + '%';
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
             
-            if (bat.charging) icon.className = "fa-solid fa-bolt battery-icon";
-            else if (pct > 75) icon.className = "fa-solid fa-battery-full battery-icon";
-            else if (pct > 50) icon.className = "fa-solid fa-battery-three-quarters battery-icon";
-            else if (pct > 25) icon.className = "fa-solid fa-battery-half battery-icon";
-            else icon.className = "fa-solid fa-battery-quarter battery-icon";
+            document.getElementById('miniTime').innerText = timeStr;
+            document.getElementById('miniDate').innerText = dateStr;
+            
+            // Show clock since status bar removed
+            document.getElementById('headerClock').style.display = 'flex';
         }
 
         function toggleWifi(isOnline) {
@@ -837,18 +823,38 @@
 
         function toggleForceNative() {
             settings.forceExternal = !settings.forceExternal;
+            saveSettings();
+        }
+        
+        function toggleZenMode() {
+            settings.zenMode = !settings.zenMode;
+            if(settings.zenMode) document.body.classList.add('zen-mode');
+            else document.body.classList.remove('zen-mode');
+            saveSettings();
+        }
+
+        function saveSettings() {
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
             updateSettingsUI();
         }
 
         function updateSettingsUI() {
-            const icon = document.getElementById('toggleExternal');
+            const iconExt = document.getElementById('toggleExternal');
             if(settings.forceExternal) {
-                icon.className = "fa-solid fa-toggle-on";
-                icon.style.color = "var(--success)";
+                iconExt.className = "fa-solid fa-toggle-on";
+                iconExt.style.color = "var(--success)";
             } else {
-                icon.className = "fa-solid fa-toggle-off";
-                icon.style.color = "inherit";
+                iconExt.className = "fa-solid fa-toggle-off";
+                iconExt.style.color = "inherit";
+            }
+            
+            const iconZen = document.getElementById('toggleZen');
+            if(settings.zenMode) {
+                iconZen.className = "fa-solid fa-toggle-on";
+                iconZen.style.color = "var(--success)";
+            } else {
+                iconZen.className = "fa-solid fa-toggle-off";
+                iconZen.style.color = "inherit";
             }
         }
 
@@ -978,7 +984,6 @@
 
             const visibleApps = myApps.filter(a => filterCat === 'all' || a.category === filterCat);
             
-            // Add Smart Search button if no apps
             if (visibleApps.length === 0 && filterCat === 'all' && myApps.length === 0) {
                  // Empty state handled by grid logic naturally, or add placeholder here
             }
@@ -1116,9 +1121,6 @@
             } else {
                 document.getElementById('tmdbSection').classList.remove('active');
             }
-            
-            // Smart Search Fallback (Show Google Card if no results)
-            // Implementation note: This is tricky with current dom structure without a redraw, sticking to visual only for now.
         }
 
         function clearSearch() {
@@ -1148,7 +1150,68 @@
             }
         }
 
-        // --- WATCHLIST & AVAILABILITY ---
+        // --- WATCHLIST FEATURES ---
+        function filterWatchlist(type) {
+            wlFilter = type;
+            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            renderWatchlist();
+        }
+
+        function shuffleWatch() {
+            if(watchlist.length === 0) return;
+            const randomItem = watchlist[Math.floor(Math.random() * watchlist.length)];
+            checkAvailability(randomItem);
+        }
+
+        function renderWatchlist() {
+            const grid = document.getElementById('watchlistGrid');
+            grid.innerHTML = '';
+            
+            let filtered = watchlist;
+            if(wlFilter !== 'all') {
+                filtered = watchlist.filter(item => item.media_type === wlFilter || (wlFilter === 'movie' && !item.media_type));
+            }
+
+            // Always new first
+            filtered = [...filtered].reverse();
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-watchlist">
+                        <i class="fa-solid fa-film empty-icon"></i>
+                        <div class="empty-text">Nothing here</div>
+                        <div class="empty-sub">Try changing filters or search to add items.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach((item) => {
+                const originalIndex = watchlist.indexOf(item);
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : null;
+                card.innerHTML = `<img src="${poster}" class="movie-poster">`;
+                card.onclick = () => checkAvailability(item);
+                
+                const x = document.createElement('div');
+                x.className = 'watchlist-remove';
+                x.innerHTML = '<i class="fa-solid fa-trash"></i>';
+                x.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    openConfirmModal(() => {
+                        watchlist.splice(originalIndex,1); 
+                        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist)); 
+                        renderWatchlist(); 
+                    });
+                };
+                
+                card.appendChild(x);
+                grid.appendChild(card);
+            });
+        }
+        
         async function checkAvailability(item) {
             const modal = document.getElementById('watchModal');
             const list = document.getElementById('watchList');
@@ -1213,68 +1276,6 @@
                 });
 
             } catch(e) { console.error(e); }
-        }
-
-        // --- WATCHLIST FEATURES ---
-        function filterWatchlist(type) {
-            wlFilter = type;
-            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            renderWatchlist();
-        }
-
-        function shuffleWatch() {
-            if(watchlist.length === 0) return;
-            const randomItem = watchlist[Math.floor(Math.random() * watchlist.length)];
-            checkAvailability(randomItem);
-        }
-
-        function renderWatchlist() {
-            const grid = document.getElementById('watchlistGrid');
-            grid.innerHTML = '';
-            
-            let filtered = watchlist;
-            if(wlFilter !== 'all') {
-                filtered = watchlist.filter(item => item.media_type === wlFilter || (wlFilter === 'movie' && !item.media_type));
-            }
-
-            // Always new first
-            filtered = [...filtered].reverse();
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-watchlist">
-                        <i class="fa-solid fa-film empty-icon"></i>
-                        <div class="empty-text">Nothing here</div>
-                        <div class="empty-sub">Try changing filters or search to add items.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            filtered.forEach((item) => {
-                const originalIndex = watchlist.indexOf(item);
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : null;
-                card.innerHTML = `<img src="${poster}" class="movie-poster">`;
-                card.onclick = () => checkAvailability(item);
-                
-                const x = document.createElement('div');
-                x.className = 'watchlist-remove';
-                x.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                x.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    openConfirmModal(() => {
-                        watchlist.splice(originalIndex,1); 
-                        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist)); 
-                        renderWatchlist(); 
-                    });
-                };
-                
-                card.appendChild(x);
-                grid.appendChild(card);
-            });
         }
 
         // --- MANAGING APPS & MODES ---
