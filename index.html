@@ -8,9 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiT3JiaXQgT1MiLCJzaG9ydF9uYW1lIjoiT3JiaXQiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDAwMDAwIiwidGhlbWVfY29sb3IiOiIjMDAwMDAwIn0=">
 
-    <title>ORBIT</title>
+    <title>ORBIT SiteBox OS</title>
     <!-- Icons & Sortable Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -44,13 +43,13 @@
                 --radius-l: 22px;
             }
             .orbit-nav {
-                width: 85% !important; /* Wider on mobile */
+                width: 85% !important; 
                 justify-content: space-between;
                 padding: 4px;
             }
             .nav-item {
                 padding: 10px 0 !important;
-                font-size: 0.85rem !important;
+                font-size: 0.8rem !important;
                 flex: 1;
                 text-align: center;
             }
@@ -59,7 +58,7 @@
                 gap: 15px !important;
             }
             .header-controls {
-                margin-top: 10px !important;
+                margin-top: 5px !important;
                 padding-top: 0 !important;
             }
             .search-wrapper { max-width: 100% !important; }
@@ -77,23 +76,24 @@
             min-height: 100vh;
             display: flex; flex-direction: column; align-items: center;
             overflow-x: hidden;
-            /* Adjusted padding since status bar is gone */
             padding-top: calc(var(--safe-top) + 80px); 
             padding-bottom: calc(var(--safe-bottom) + 60px);
             transition: background 1s ease;
         }
 
-        /* --- NAVBAR (HIGHER) --- */
+        /* --- NAVBAR --- */
         .orbit-nav {
             position: fixed; top: calc(var(--safe-top) + 10px);
             left: 50%; transform: translateX(-50%);
+            width: auto; 
+            min-width: 320px;
+            max-width: 900px;
             background: rgba(22, 22, 24, 0.85); 
             backdrop-filter: blur(50px) saturate(180%); -webkit-backdrop-filter: blur(50px) saturate(180%);
             padding: 5px; border-radius: 100px; display: flex;
             align-items: center; gap: 2px; z-index: 1000;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 0 0 1px var(--glass-border);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
-            max-width: 900px; width: auto; 
         }
         
         body.edit-mode .orbit-nav { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(-30px); }
@@ -116,23 +116,22 @@
         }
 
         .header-btn {
-            width: 44px; height: 44px; border-radius: 50%;
+            width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
             background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
             color: white; font-size: 1.1rem; cursor: pointer; transition: 0.3s;
             backdrop-filter: blur(10px);
         }
         .header-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
-        /* Dynamic color for settings icon */
         .header-btn i { color: var(--accent); transition: color 0.3s ease; }
 
-        /* Clock Widget */
-        .header-clock {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: rgba(255,255,255,0.9); font-weight: 600; line-height: 1.1;
-            margin-right: auto; /* Push search to right if needed, or remove if using flex gap */
-            display: none; /* Hidden by default, shown via flex in layout */
+        /* Battery Widget */
+        .header-battery {
+            display: flex; align-items: center; gap: 6px;
+            color: rgba(255,255,255,0.9); font-weight: 600; font-size: 0.9rem;
+            margin-left: auto; /* Push to right */
+            min-width: 60px; justify-content: flex-end;
         }
-        
+
         /* DONE BUTTON (Edit Mode) */
         .done-btn {
             position: fixed; top: calc(var(--safe-top) + 15px); right: 24px;
@@ -352,7 +351,7 @@
         }
 
         .modal-window {
-            background: rgba(30, 30, 35, 0.9); border-radius: 36px; padding: 25px; width: 90%; max-width: 400px;
+            background: rgba(30, 30, 35, 0.95); border-radius: 36px; padding: 25px; width: 90%; max-width: 400px;
             text-align: center; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.1);
             max-height: 85vh; display: flex; flex-direction: column; box-sizing: border-box;
             transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -360,18 +359,41 @@
         .modal-overlay.active .modal-window { transform: scale(1) translateY(0); }
 
         .modal-title { font-size: 1.6rem; margin-bottom: 8px; font-weight: 800; color: white; letter-spacing: -0.5px; }
-        .modal-subtitle { color: #999; margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5; font-weight: 400; }
+        .modal-subtitle { color: #999; margin-bottom: 10px; font-size: 0.95rem; line-height: 1.5; font-weight: 600; text-align: left; }
+        
+        /* Modal Scroll Content */
+        .modal-scroll-content {
+            flex: 1; overflow-y: auto; width: 100%; padding: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
 
-        .btn-list { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding: 0 5px; }
+        .btn-list { display: flex; flex-direction: column; gap: 12px; }
         .action-btn {
-            background: rgba(255,255,255,0.05); padding: 16px 20px; border-radius: 20px;
+            background: rgba(255,255,255,0.08); padding: 16px 20px; border-radius: 20px;
             display: flex; align-items: center; gap: 16px; cursor: pointer; color: white;
             transition: all 0.25s; border: 1px solid transparent;
         }
-        .action-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
-        .action-btn img, .action-btn i { width: 30px; height: 30px; object-fit: contain; text-align: center; font-size: 1.3rem; }
+        .action-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.12); }
+        .action-btn img, .action-btn i { width: 24px; height: 24px; object-fit: contain; text-align: center; font-size: 1.2rem; }
         .action-btn span { font-weight: 600; font-size: 1rem; flex: 1; text-align: left; }
         .action-value { color: #888; font-size: 0.9rem; margin-left: auto; }
+        
+        /* Theme dots in Settings */
+        .theme-row { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .theme-btn { 
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); 
+            transition: transform 0.2s;
+        }
+        .theme-btn:active { transform: scale(0.9); }
+        .theme-btn.active { border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+        /* Sort buttons in Settings */
+        .sort-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .sort-btn { 
+            flex: 1; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 12px;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer; color: white; text-align: center;
+        }
+        .sort-btn:active { background: rgba(255,255,255,0.2); }
 
         /* Inputs & Buttons */
         .input-group { margin-bottom: 16px; text-align: left; position: relative; }
@@ -474,16 +496,17 @@
 
     <!-- Header -->
     <div class="header-controls">
-        <div class="header-btn" onclick="openSettings()"><i class="fa-solid fa-gear"></i></div>
+        <div class="header-btn" onclick="openSettings()"><i class="fa-solid fa-gear" id="settingsIcon"></i></div>
         <div class="search-wrapper">
             <i class="fa-solid fa-search search-icon"></i>
             <input type="text" class="search-input" id="searchInput" placeholder="Search..." onkeyup="handleSearch()">
             <div class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></div>
         </div>
-        <!-- Clock Widget in Header -->
-        <div class="header-clock" id="headerClock">
-            <div style="font-size: 0.9rem;" id="miniTime">12:00</div>
-            <div style="font-size: 0.7rem; opacity: 0.7;" id="miniDate">Mon 1</div>
+        
+        <!-- Battery Widget -->
+        <div class="header-battery" id="headerBattery" style="display:none; align-items:center; gap:6px;">
+            <span id="headerBatPercent" style="font-size:0.9rem; font-weight:600;">--%</span>
+            <i id="headerBatIcon" class="fa-solid fa-battery-full" style="font-size:1.1rem;"></i>
         </div>
     </div>
 
@@ -528,7 +551,9 @@
         <div class="modal-window">
             <div class="modal-title" id="movieTitle">Title</div>
             <div class="modal-subtitle" id="movieSub">Checking availability...</div>
-            <div class="btn-list" id="watchList"></div>
+            <div class="modal-scroll-content">
+                <div class="btn-list" id="watchList"></div>
+            </div>
             <button class="btn btn-ghost" onclick="document.getElementById('watchModal').classList.remove('active')">Close</button>
         </div>
     </div>
@@ -538,33 +563,71 @@
         <div class="modal-window">
             <div class="modal-title">Settings</div>
             
-            <div class="btn-list">
-                <div class="action-btn" onclick="toggleForceNative()">
-                    <i class="fa-solid fa-earth-americas"></i>
-                    <span>Force External Browser</span>
-                    <i class="fa-solid fa-toggle-off" id="toggleExternal"></i>
+            <div class="modal-scroll-content">
+                <div class="modal-subtitle">Appearance</div>
+                <div class="theme-row">
+                    <div class="theme-btn active" style="background:#0A84FF;" onclick="setTheme('#0A84FF')"></div>
+                    <div class="theme-btn" style="background:#5E5CE6;" onclick="setTheme('#5E5CE6')"></div>
+                    <div class="theme-btn" style="background:#30D158;" onclick="setTheme('#30D158')"></div>
+                    <div class="theme-btn" style="background:#FF9F0A;" onclick="setTheme('#FF9F0A')"></div>
+                    <div class="theme-btn" style="background:#FF453A;" onclick="setTheme('#FF453A')"></div>
                 </div>
-                 <div class="action-btn" onclick="toggleZenMode()">
-                    <i class="fa-solid fa-eye-slash"></i>
-                    <span>Zen Mode</span>
-                    <i class="fa-solid fa-toggle-off" id="toggleZen"></i>
+                
+                <div class="modal-subtitle">Background</div>
+                <div class="input-group">
+                    <i class="fa-solid fa-image input-icon"></i>
+                    <input type="text" class="input-field" id="bgUrl" placeholder="Image URL..." onchange="saveBackground()">
                 </div>
-                <div class="action-btn" onclick="clearRecents()">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    <span>Clear Recents</span>
+                
+                <div class="modal-subtitle">Search Engine</div>
+                <div class="input-group">
+                    <i class="fa-solid fa-search input-icon"></i>
+                    <select class="input-field" id="searchEngine" onchange="saveSearchEngine()" style="padding-left:50px;">
+                        <option value="google">Google</option>
+                        <option value="ddg">DuckDuckGo</option>
+                        <option value="bing">Bing</option>
+                    </select>
                 </div>
-                <div class="action-btn" style="cursor: default;">
-                     <i class="fa-solid fa-hard-drive"></i>
-                     <span>Storage</span>
-                     <span class="action-value" id="storageStats">0 KB</span>
+
+                <div class="modal-subtitle">Organize</div>
+                <div class="sort-row">
+                    <div class="sort-btn" onclick="sortLibrary('az')">A-Z</div>
+                    <div class="sort-btn" onclick="sortLibrary('newest')">Newest</div>
                 </div>
-                <div class="action-btn" onclick="resetApp()" style="color:var(--danger)">
-                    <i class="fa-solid fa-rotate-right"></i>
-                    <span>Reset All Data</span>
+
+                <div class="btn-list">
+                    <div class="action-btn" onclick="toggleForceNative()">
+                        <i class="fa-solid fa-earth-americas"></i>
+                        <span>Force External Browser</span>
+                        <i class="fa-solid fa-toggle-off" id="toggleExternal"></i>
+                    </div>
+                     <div class="action-btn" onclick="toggleZenMode()">
+                        <i class="fa-solid fa-eye-slash"></i>
+                        <span>Zen Mode (No Labels)</span>
+                        <i class="fa-solid fa-toggle-off" id="toggleZen"></i>
+                    </div>
+                    <div class="action-btn" onclick="toggleGridSize()">
+                        <i class="fa-solid fa-border-all"></i>
+                        <span>Compact Grid</span>
+                        <i class="fa-solid fa-toggle-off" id="toggleGrid"></i>
+                    </div>
+                    <div class="action-btn" onclick="clearRecents()">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Clear Recents</span>
+                    </div>
+                    <div class="action-btn" style="cursor: default;">
+                         <i class="fa-solid fa-hard-drive"></i>
+                         <span>Storage</span>
+                         <span class="action-value" id="storageStats">0 KB</span>
+                    </div>
+                    <div class="action-btn" onclick="resetApp()" style="color:var(--danger)">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Reset All Data</span>
+                    </div>
                 </div>
             </div>
 
-            <button class="btn btn-ghost" onclick="document.getElementById('settingsModal').classList.remove('active')">Close</button>
+            <button class="btn btn-primary" onclick="document.getElementById('settingsModal').classList.remove('active')">Save</button>
         </div>
     </div>
 
@@ -700,7 +763,7 @@
         let myApps = [];
         let watchlist = [];
         let recents = [];
-        let settings = { forceExternal: false, zenMode: false };
+        let settings = { forceExternal: false, zenMode: false, accentColor: '#0A84FF', searchEngine: 'google', bgUrl: '', compactGrid: false, use24h: true };
         let isEditMode = false;
         let currentTab = 'home';
         let currentActiveAppUrl = '';
@@ -710,7 +773,7 @@
         let selectedOnboardingApps = [];
         let confirmCallback = null;
         let longPressTimer;
-
+        
         function init() {
             const savedApps = localStorage.getItem(STORAGE_KEY);
             if (savedApps) {
@@ -730,12 +793,22 @@
             const savedSettings = localStorage.getItem(SETTINGS_KEY);
             if(savedSettings) {
                 settings = JSON.parse(savedSettings);
-                if(settings.zenMode) document.body.classList.add('zen-mode');
+                applySettings();
             }
             updateSettingsUI();
 
-            setupClock();
-            setInterval(setupClock, 60000); 
+            // Battery - Updated to replace Clock logic
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(bat => {
+                    updateBattery(bat);
+                    bat.addEventListener('levelchange', () => updateBattery(bat));
+                    bat.addEventListener('chargingchange', () => updateBattery(bat));
+                    document.getElementById('headerBattery').style.display = 'flex'; // Ensure visible
+                }).catch(e => {
+                    // Battery API not supported or failed
+                    console.log('Battery API not supported');
+                });
+            }
 
             window.addEventListener('offline', () => toggleWifi(false));
             window.addEventListener('online', () => toggleWifi(true));
@@ -749,16 +822,24 @@
             });
         }
         
-        function setupClock() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
-            const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+        function applySettings() {
+            if(settings.zenMode) document.body.classList.add('zen-mode');
+            if(settings.compactGrid) document.body.classList.add('grid-compact');
+            if(settings.accentColor) document.documentElement.style.setProperty('--accent', settings.accentColor);
+            if(!settings.searchEngine) settings.searchEngine = 'google';
+            if(settings.bgUrl) document.body.style.backgroundImage = `url('${settings.bgUrl}')`;
+        }
+        
+        function updateBattery(bat) {
+            const icon = document.getElementById('headerBatIcon');
+            const pct = Math.round(bat.level * 100);
+            document.getElementById('headerBatPercent').innerText = pct + '%';
             
-            document.getElementById('miniTime').innerText = timeStr;
-            document.getElementById('miniDate').innerText = dateStr;
-            
-            // Show clock since status bar removed
-            document.getElementById('headerClock').style.display = 'flex';
+            if (bat.charging) icon.className = "fa-solid fa-bolt";
+            else if (pct > 75) icon.className = "fa-solid fa-battery-full";
+            else if (pct > 50) icon.className = "fa-solid fa-battery-three-quarters";
+            else if (pct > 25) icon.className = "fa-solid fa-battery-half";
+            else icon.className = "fa-solid fa-battery-quarter";
         }
 
         function toggleWifi(isOnline) {
@@ -818,7 +899,21 @@
             }
             document.getElementById('storageStats').innerText = (total / 1024).toFixed(2) + " KB";
             
+            // Highlight active theme
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                if(btn.getAttribute('onclick').includes(settings.accentColor)) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            
+            document.getElementById('searchEngine').value = settings.searchEngine;
+            document.getElementById('bgUrl').value = settings.bgUrl || '';
+            
             document.getElementById('settingsModal').classList.add('active');
+        }
+        
+        function saveSearchEngine() {
+            settings.searchEngine = document.getElementById('searchEngine').value;
+            saveSettings();
         }
 
         function toggleForceNative() {
@@ -832,6 +927,35 @@
             else document.body.classList.remove('zen-mode');
             saveSettings();
         }
+        
+        function toggleGridSize() {
+            settings.compactGrid = !settings.compactGrid;
+            applySettings();
+            saveSettings();
+        }
+        
+        function saveBackground() {
+            settings.bgUrl = document.getElementById('bgUrl').value;
+            applySettings();
+            saveSettings();
+        }
+        
+        function setTheme(color) {
+            settings.accentColor = color;
+            document.documentElement.style.setProperty('--accent', color);
+            saveSettings();
+            openSettings(); // Refresh UI
+        }
+        
+        function sortLibrary(method) {
+            if(method === 'az') {
+                myApps.sort((a,b) => a.name.localeCompare(b.name));
+            } else if (method === 'newest') {
+                myApps.reverse();
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+            renderGrid();
+        }
 
         function saveSettings() {
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -839,23 +963,16 @@
         }
 
         function updateSettingsUI() {
-            const iconExt = document.getElementById('toggleExternal');
-            if(settings.forceExternal) {
-                iconExt.className = "fa-solid fa-toggle-on";
-                iconExt.style.color = "var(--success)";
-            } else {
-                iconExt.className = "fa-solid fa-toggle-off";
-                iconExt.style.color = "inherit";
-            }
-            
-            const iconZen = document.getElementById('toggleZen');
-            if(settings.zenMode) {
-                iconZen.className = "fa-solid fa-toggle-on";
-                iconZen.style.color = "var(--success)";
-            } else {
-                iconZen.className = "fa-solid fa-toggle-off";
-                iconZen.style.color = "inherit";
-            }
+            const setToggle = (id, state) => {
+                const el = document.getElementById(id);
+                if(el) { 
+                    if(state) { el.className = "fa-solid fa-toggle-on"; el.style.color = "var(--success)"; }
+                    else { el.className = "fa-solid fa-toggle-off"; el.style.color = "inherit"; }
+                }
+            };
+            setToggle('toggleExternal', settings.forceExternal);
+            setToggle('toggleZen', settings.zenMode);
+            setToggle('toggleGrid', settings.compactGrid);
         }
 
         function resetApp() {
@@ -1071,11 +1188,16 @@
 
             // Apply Theme Color
             const r = document.querySelector(':root');
-            if(tab === 'home' || tab === 'all') r.style.setProperty('--accent', 'var(--theme-home)');
-            else if(tab === 'video') r.style.setProperty('--accent', 'var(--theme-video)');
-            else if(tab === 'music') r.style.setProperty('--accent', 'var(--theme-music)');
-            else if(tab === 'watchlist') r.style.setProperty('--accent', 'var(--theme-list)');
-
+            let color = settings.accentColor;
+            
+            // Tab specific overrides if not user locked (optional, lets stick to user accent for consistency)
+            // But let's color the Settings Icon based on tab for that request
+            const settingsIcon = document.getElementById('settingsIcon');
+            if(tab === 'home') settingsIcon.style.color = 'var(--theme-home)';
+            else if(tab === 'video') settingsIcon.style.color = 'var(--theme-video)';
+            else if(tab === 'music') settingsIcon.style.color = 'var(--theme-music)';
+            else if(tab === 'watchlist') settingsIcon.style.color = 'var(--theme-list)';
+            
             const appGrid = document.getElementById('appGrid');
             const watchGrid = document.getElementById('watchlistGrid');
             const tmdb = document.getElementById('tmdbSection');
@@ -1115,12 +1237,44 @@
                 const name = el.innerText.toLowerCase();
                 el.style.display = name.includes(q) ? 'flex' : 'none';
             });
+            
+            // Search Engine Fallback
+            const appGrid = document.getElementById('appGrid');
+            if (isSearching) {
+                let existingSearchCard = document.getElementById('searchWebCard');
+                if(!existingSearchCard) {
+                    const searchCard = document.createElement('div');
+                    searchCard.id = 'searchWebCard';
+                    searchCard.className = 'app-item';
+                    searchCard.innerHTML = `
+                        <div class="app-card" style="background: rgba(255,255,255,0.1)">
+                            <div class="app-content"><i class="fa-solid fa-magnifying-glass app-icon-fa"></i></div>
+                        </div>
+                        <div class="app-label">Search Web</div>
+                    `;
+                    searchCard.onclick = () => performWebSearch(q);
+                    appGrid.appendChild(searchCard);
+                } else {
+                    existingSearchCard.onclick = () => performWebSearch(q);
+                    appGrid.appendChild(existingSearchCard);
+                }
+            } else {
+                const existingSearchCard = document.getElementById('searchWebCard');
+                if(existingSearchCard) existingSearchCard.remove();
+            }
 
             if(q.length > 2) {
                 searchTimer = setTimeout(() => fetchTMDB(q), 500);
             } else {
                 document.getElementById('tmdbSection').classList.remove('active');
             }
+        }
+        
+        function performWebSearch(query) {
+            let url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            if(settings.searchEngine === 'ddg') url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            if(settings.searchEngine === 'bing') url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
         }
 
         function clearSearch() {
