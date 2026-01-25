@@ -2868,7 +2868,710 @@ window.addEventListener('load', () => {
     // Add smooth scrolling
     document.documentElement.style.scrollBehavior = 'smooth';
     
-    console.log('✓ ORBIT Premium initialized');
+    console.log('✓ ORBIT initialized');
+});
+
+// Add to init()
+function init() {
+    // Show loading indicator
+    document.body.insertAdjacentHTML('beforeend', `
+        <div id="appLoader" style="
+            position: fixed; inset: 0; background: #000; 
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.5s;
+        ">
+            <div style="text-align: center;">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 48px; color: var(--accent); margin-bottom: 16px;"></i>
+                <div style="color: rgba(255,255,255,0.7); font-size: 14px; letter-spacing: 2px;">ORBIT</div>
+            </div>
+        </div>
+    `);
+    
+    // Your existing init code...
+    
+    // Hide loader after everything loads
+    setTimeout(() => {
+        const loader = document.getElementById('appLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+    }, 800);
+}
+
+// Add after init()
+document.addEventListener('keydown', (e) => {
+    // ESC to close modals/windows
+    if (e.key === 'Escape') {
+        if (document.getElementById('iframeContainer').classList.contains('active')) {
+            closeWindow();
+        } else {
+            document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+        }
+    }
+    
+    // CMD/CTRL + K for search
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+    }
+    
+    // CMD/CTRL + , for settings
+    if ((e.metaKey || e.ctrlKey) && e.key === ',') {
+        e.preventDefault();
+        openSettings();
+    }
+    
+    // Number keys 1-4 for tabs
+    if (e.key >= '1' && e.key <= '4' && !e.target.matches('input, textarea')) {
+        const tabs = ['home', 'video', 'music', 'watchlist'];
+        switchTab(tabs[parseInt(e.key) - 1]);
+    }
+});
+
+// Replace startLongPress with enhanced version
+let lastTapTime = 0;
+let lastTappedCard = null;
+
+function startLongPress(e) {
+    if (isEditMode) return;
+    const card = e.currentTarget;
+    
+    // Double-tap detection
+    const currentTime = Date.now();
+    if (currentTime - lastTapTime < 300 && lastTappedCard === card) {
+        // Double tap detected - add to favorites
+        const appItem = card.closest('.app-item');
+        const appIndex = parseInt(appItem.dataset.id);
+        const app = myApps[appIndex];
+        
+        addToRecents(app);
+        showToast(`★ ${app.name} added to recents`, 'success');
+        if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+        
+        lastTapTime = 0;
+        lastTappedCard = null;
+        return;
+    }
+    
+    lastTapTime = currentTime;
+    lastTappedCard = card;
+    
+    // Long press for edit mode
+    card.classList.add('pressing');
+    longPressTimer = setTimeout(() => {
+        enableEditMode();
+        if (navigator.vibrate) navigator.vibrate(50);
+        card.classList.remove('pressing');
+    }, 800);
+}
+
+// Add after init()
+let touchStartY = 0;
+let pullDistance = 0;
+const pullThreshold = 80;
+
+document.addEventListener('touchstart', (e) => {
+    if (window.scrollY === 0) {
+        touchStartY = e.touches[0].clientY;
+    }
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+    if (touchStartY > 0) {
+        pullDistance = e.touches[0].clientY - touchStartY;
+        if (pullDistance > 0 && pullDistance < pullThreshold * 1.5) {
+            // Visual feedback
+            document.body.style.transform = `translateY(${pullDistance * 0.5}px)`;
+            document.body.style.opacity = 1 - (pullDistance / pullThreshold) * 0.2;
+        }
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+    if (pullDistance > pullThreshold) {
+        // Trigger refresh
+        showToast('Refreshing...', 'info');
+        renderGrid();
+        renderRecents();
+        if (navigator.vibrate) navigator.vibrate(20);
+    }
+    
+    // Reset
+    document.body.style.transform = '';
+    document.body.style.opacity = '';
+    touchStartY = 0;
+    pullDistance = 0;
+});
+
+// Enhanced right-click menu
+function showContextMenu(app, appIndex, x, y) {
+    const existing = document.getElementById('contextMenu');
+    if (existing) existing.remove();
+    
+    const menu = document.createElement('div');
+    menu.id = 'contextMenu';
+    menu.style.cssText = `
+        position: fixed; left: ${x}px; top: ${y}px;
+        background: rgba(28, 28, 30, 0.95);
+        backdrop-filter: blur(60px);
+        border-radius: 16px;
+        padding: 8px;
+        z-index: 5000;
+        min-width: 200px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        animation: menuPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+    
+    menu.innerHTML = `
+        <div class="ctx-item" onclick="openWindow(myApps[${appIndex}]); closeContextMenu();">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Open</span>
+        </div>
+        <div class="ctx-item" onclick="addToRecents(myApps[${appIndex}]); closeContextMenu(); showToast('Added to recents', 'success');">
+            <i class="fa-solid fa-star"></i>
+            <span>Add to Recents</span>
+        </div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-item danger" onclick="removeApp(${appIndex}); closeContextMenu();">
+            <i class="fa-solid fa-trash"></i>
+            <span>Remove</span>
+        </div>
+    `;
+    
+    document.body.appendChild(menu);
+    
+    // Close on click outside
+    setTimeout(() => {
+        document.addEventListener('click', closeContextMenu);
+    }, 100);
+}
+
+function closeContextMenu() {
+    const menu = document.getElementById('contextMenu');
+    if (menu) menu.remove();
+    document.removeEventListener('click', closeContextMenu);
+}
+
+// Add CSS for context menu
+const ctxStyles = document.createElement('style');
+ctxStyles.textContent = `
+    @keyframes menuPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .ctx-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 16px; border-radius: 10px;
+        cursor: pointer; color: white;
+        transition: background 0.2s;
+    }
+    .ctx-item:hover { background: rgba(255,255,255,0.1); }
+    .ctx-item.danger { color: #ff453a; }
+    .ctx-item i { width: 20px; }
+    .ctx-divider { height: 0.5px; background: rgba(255,255,255,0.1); margin: 4px 8px; }
+`;
+document.head.appendChild(ctxStyles);
+// Add swipe navigation between tabs
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+}, { passive: true });
+
+function handleSwipe() {
+    const swipeThreshold = 100;
+    const diff = touchStartX - touchEndX;
+    
+    if (Math.abs(diff) < swipeThreshold) return;
+    
+    const tabs = ['home', 'video', 'music', 'watchlist'];
+    const currentIndex = tabs.indexOf(currentTab);
+    
+    if (diff > 0 && currentIndex < tabs.length - 1) {
+        // Swipe left - next tab
+        switchTab(tabs[currentIndex + 1]);
+        if (navigator.vibrate) navigator.vibrate(5);
+    } else if (diff < 0 && currentIndex > 0) {
+        // Swipe right - previous tab
+        switchTab(tabs[currentIndex - 1]);
+        if (navigator.vibrate) navigator.vibrate(5);
+    }
+}
+
+
+
+
+// Track app usage
+let appStats = JSON.parse(localStorage.getItem('orbit_stats') || '{}');
+
+function trackAppOpen(appName) {
+    if (!appStats[appName]) {
+        appStats[appName] = { opens: 0, lastOpened: null };
+    }
+    appStats[appName].opens++;
+    appStats[appName].lastOpened = Date.now();
+    localStorage.setItem('orbit_stats', JSON.stringify(appStats));
+}
+
+// Add to openWindow()
+const originalOpenWindow = openWindow;
+openWindow = function(app) {
+    trackAppOpen(app.name);
+    originalOpenWindow(app);
+};
+
+// Show stats in settings
+function showStats() {
+    const sorted = Object.entries(appStats)
+        .sort((a, b) => b[1].opens - a[1].opens)
+        .slice(0, 5);
+    
+    const statsHTML = sorted.map(([name, data]) => `
+        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+            <span>${name}</span>
+            <span style="color: var(--accent);">${data.opens} opens</span>
+        </div>
+    `).join('');
+    
+    return `<div class="modal-subtitle">Most Used Apps</div>${statsHTML}`;
+}
+
+// Queue actions when offline
+let offlineQueue = [];
+
+function queueAction(action) {
+    offlineQueue.push(action);
+    localStorage.setItem('orbit_offline_queue', JSON.stringify(offlineQueue));
+    showToast('Action queued for when online', 'info');
+}
+
+function processOfflineQueue() {
+    if (offlineQueue.length === 0) return;
+    
+    showToast(`Processing ${offlineQueue.length} queued actions...`, 'info');
+    
+    offlineQueue.forEach(action => {
+        try {
+            eval(action); // Execute queued code
+        } catch (e) {
+            console.error('Failed to process queued action:', e);
+        }
+    });
+    
+    offlineQueue = [];
+    localStorage.removeItem('orbit_offline_queue');
+    showToast('All queued actions processed!', 'success');
+}
+
+window.addEventListener('online', () => {
+    showToast('Back online!', 'success');
+    processOfflineQueue();
+});
+
+window.addEventListener('offline', () => {
+    showToast('Offline mode - actions will be queued', 'info');
+});
+
+// Load queue on init
+const savedQueue = localStorage.getItem('orbit_offline_queue');
+if (savedQueue) offlineQueue = JSON.parse(savedQueue);
+
+// Voice control
+let recognition;
+
+function initVoiceControl() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        console.log('Voice control not supported');
+        return;
+    }
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        handleVoiceCommand(transcript);
+    };
+    
+    recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+    };
+}
+
+function handleVoiceCommand(command) {
+    showToast(`Heard: "${command}"`, 'info');
+    
+    // Open app by name
+    const app = myApps.find(a => command.includes(a.name.toLowerCase()));
+    if (app) {
+        openWindow(app);
+        return;
+    }
+    
+    // Navigate tabs
+    if (command.includes('home')) switchTab('home');
+    else if (command.includes('video')) switchTab('video');
+    else if (command.includes('music') || command.includes('audio')) switchTab('music');
+    else if (command.includes('list') || command.includes('watchlist')) switchTab('watchlist');
+    
+    // Settings
+    else if (command.includes('settings')) openSettings();
+    
+    // Search
+    else if (command.includes('search for')) {
+        const query = command.replace('search for', '').trim();
+        document.getElementById('searchInput').value = query;
+        handleSearch();
+    }
+    
+    else {
+        showToast('Command not recognized', 'error');
+    }
+}
+
+function startVoiceCommand() {
+    if (!recognition) {
+        showToast('Voice control not available', 'error');
+        return;
+    }
+    
+    showToast('Listening...', 'info');
+    if (navigator.vibrate) navigator.vibrate(10);
+    recognition.start();
+}
+
+// Add to init()
+// initVoiceControl();
+
+// Trigger with long press on search icon
+document.querySelector('.search-icon').addEventListener('mousedown', (e) => {
+    const timer = setTimeout(() => startVoiceCommand(), 500);
+    document.addEventListener('mouseup', () => clearTimeout(timer), { once: true });
+});
+
+// Auto-sort by most used
+function autoOrganizeByUsage() {
+    const appsWithStats = myApps.map(app => ({
+        ...app,
+        opens: appStats[app.name]?.opens || 0
+    }));
+    
+    appsWithStats.sort((a, b) => b.opens - a.opens);
+    
+    myApps = appsWithStats.map(({ opens, ...app }) => app);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+    renderGrid();
+    showToast('Apps organized by usage!', 'success');
+}
+
+// Auto-sort by category
+function autoOrganizeByCategory() {
+    myApps.sort((a, b) => {
+        if (a.category !== b.category) {
+            const order = ['video', 'music', 'social', 'other'];
+            return order.indexOf(a.category) - order.indexOf(b.category);
+        }
+        return a.name.localeCompare(b.name);
+    });
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+    renderGrid();
+    showToast('Apps organized by category!', 'success');
+}
+
+// Export watchlist as shareable link
+function shareWatchlist() {
+    const data = btoa(JSON.stringify(watchlist));
+    const shareUrl = `${window.location.origin}${window.location.pathname}?import=${data}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'My ORBIT Watchlist',
+            text: 'Check out my watchlist!',
+            url: shareUrl
+        }).then(() => {
+            showToast('Watchlist shared!', 'success');
+        }).catch(err => {
+            copyToClipboard(shareUrl);
+        });
+    } else {
+        copyToClipboard(shareUrl);
+    }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Link copied to clipboard!', 'success');
+    }).catch(() => {
+        showToast('Failed to copy link', 'error');
+    });
+}
+
+// Import watchlist from URL
+function checkForImport() {
+    const params = new URLSearchParams(window.location.search);
+    const importData = params.get('import');
+    
+    if (importData) {
+        try {
+            const imported = JSON.parse(atob(importData));
+            if (confirm(`Import ${imported.length} items to your watchlist?`)) {
+                watchlist = [...watchlist, ...imported];
+                // Remove duplicates
+                watchlist = watchlist.filter((item, index, self) => 
+                    index === self.findIndex(i => i.id === item.id)
+                );
+                localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+                showToast(`Imported ${imported.length} items!`, 'success');
+                
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        } catch (e) {
+            showToast('Invalid import link', 'error');
+        }
+    }
+}
+
+// Call in init()
+// checkForImport();
+
+// Enable PiP when available
+let pipWindow = null;
+
+async function enablePictureInPicture() {
+    const iframe = document.getElementById('appFrame');
+    
+    try {
+        // Check if the iframe contains a video element
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const video = iframeDoc.querySelector('video');
+        
+        if (video && document.pictureInPictureEnabled) {
+            if (document.pictureInPictureElement) {
+                await document.exitPictureInPicture();
+            } else {
+                await video.requestPictureInPicture();
+                showToast('Picture-in-Picture enabled', 'success');
+            }
+        } else {
+            showToast('PiP not available for this content', 'error');
+        }
+    } catch (e) {
+        console.error('PiP error:', e);
+        showToast('Cannot enable Picture-in-Picture', 'error');
+    }
+}
+
+// Add PiP button to iframe controls (call this when rendering iframe header)
+function addPipButton() {
+    const controls = document.querySelector('.iframe-controls');
+    const pipBtn = document.createElement('div');
+    pipBtn.className = 'win-btn';
+    pipBtn.title = 'Picture-in-Picture';
+    pipBtn.innerHTML = '<i class="fa-solid fa-picture-in-picture-alt"></i>';
+    pipBtn.onclick = enablePictureInPicture;
+    controls.insertBefore(pipBtn, controls.firstChild);
+}
+
+// Export all data
+function exportAllData() {
+    const backup = {
+        version: '1.0',
+        timestamp: Date.now(),
+        apps: myApps,
+        watchlist: watchlist,
+        recents: recents,
+        settings: settings,
+        stats: appStats
+    };
+    
+    const dataStr = JSON.stringify(backup, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `orbit-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+    showToast('Backup downloaded!', 'success');
+}
+
+// Import data
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = (event) => {
+            try {
+                const backup = JSON.parse(event.target.result);
+                
+                if (confirm('This will replace all current data. Continue?')) {
+                    myApps = backup.apps || [];
+                    watchlist = backup.watchlist || [];
+                    recents = backup.recents || [];
+                    settings = backup.settings || settings;
+                    appStats = backup.stats || {};
+                    
+                    // Save everything
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+                    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+                    localStorage.setItem(RECENTS_KEY, JSON.stringify(recents));
+                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                    localStorage.setItem('orbit_stats', JSON.stringify(appStats));
+                    
+                    showToast('Data restored successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            } catch (e) {
+                showToast('Invalid backup file', 'error');
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+// Track performance metrics
+const perfMetrics = {
+    appOpenTimes: [],
+    searchTimes: [],
+    gridRenderTimes: []
+};
+
+function measurePerformance(name, fn) {
+    const start = performance.now();
+    const result = fn();
+    const duration = performance.now() - start;
+    
+    if (perfMetrics[name]) {
+        perfMetrics[name].push(duration);
+        // Keep last 50 measurements
+        if (perfMetrics[name].length > 50) perfMetrics[name].shift();
+    }
+    
+    return result;
+}
+
+// Usage example
+const enhancedRenderGrid = renderGrid;
+renderGrid = function() {
+    measurePerformance('gridRenderTimes', enhancedRenderGrid);
+};
+
+// Show performance stats
+function showPerformanceStats() {
+    const avg = (arr) => arr.length ? (arr.reduce((a,b) => a+b, 0) / arr.length).toFixed(2) : 0;
+    
+    console.log('Performance Metrics:');
+    console.log(`Grid render avg: ${avg(perfMetrics.gridRenderTimes)}ms`);
+    console.log(`Search avg: ${avg(perfMetrics.searchTimes)}ms`);
+    console.log(`App open avg: ${avg(perfMetrics.appOpenTimes)}ms`);
+}
+
+// Add to settings
+// showPerformanceStats();
+
+// Adapt quality based on connection
+function detectConnectionQuality() {
+    if ('connection' in navigator) {
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        
+        const effectiveType = conn.effectiveType; // '4g', '3g', '2g', 'slow-2g'
+        const saveData = conn.saveData;
+        
+        if (saveData || effectiveType === 'slow-2g' || effectiveType === '2g') {
+            // Low quality mode
+            document.body.classList.add('low-quality-mode');
+            showToast('Low data mode activated', 'info');
+        }
+        
+        conn.addEventListener('change', () => {
+            console.log('Connection changed:', conn.effectiveType);
+        });
+    }
+}
+
+// Call in init()
+// detectConnectionQuality();
+
+// Konami code easter egg
+let konamiCode = [];
+const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+
+document.addEventListener('keydown', (e) => {
+    konamiCode.push(e.key);
+    konamiCode = konamiCode.slice(-10);
+    
+    if (konamiCode.join(',') === konamiSequence.join(',')) {
+        activateEasterEgg();
+    }
+});
+
+function activateEasterEgg() {
+    // Rainbow mode!
+    document.body.style.animation = 'rainbow 3s infinite';
+    showToast('🌈 RAINBOW MODE ACTIVATED! 🌈', 'success');
+    
+    if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100, 50, 100]);
+    }
+    
+    setTimeout(() => {
+        document.body.style.animation = '';
+    }, 10000);
+}
+
+// Add rainbow animation CSS
+const rainbowStyle = document.createElement('style');
+rainbowStyle.textContent = `
+    @keyframes rainbow {
+        0% { filter: hue-rotate(0deg); }
+        100% { filter: hue-rotate(360deg); }
+    }
+`;
+document.head.appendChild(rainbowStyle);
+
+// Shake to randomize
+let shakeCount = 0;
+let lastShake = 0;
+
+window.addEventListener('devicemotion', (e) => {
+    const acc = e.accelerationIncludingGravity;
+    const threshold = 15;
+    
+    if (Math.abs(acc.x) > threshold || Math.abs(acc.y) > threshold || Math.abs(acc.z) > threshold) {
+        const now = Date.now();
+        if (now - lastShake > 1000) {
+            shakeCount++;
+            lastShake = now;
+            
+            if (shakeCount >= 3) {
+                // Randomize app order
+                myApps.sort(() => Math.random() - 0.5);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(myApps));
+                renderGrid();
+                showToast('Apps shuffled! 🎲', 'success');
+                if (navigator.vibrate) navigator.vibrate(50);
+                shakeCount = 0;
+            }
+        }
+    }
 });
     </script>
 </body>
