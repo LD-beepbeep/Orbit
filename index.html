@@ -474,6 +474,1045 @@
         .onboarding-info p { margin: 8px 0; color: rgba(255,255,255,0.7); line-height: 1.5; }
         .onboarding-info i { color: var(--accent); width: 24px; text-align: center; margin-right: 8px; }
 
+/* CAST BUTTON - Chromecast integration styling */
+.win-btn.cast {
+    background: rgba(10, 132, 255, 0.15);
+    color: var(--accent);
+}
+.win-btn.cast.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 20px rgba(10, 132, 255, 0.5);
+    animation: castPulse 2s infinite;
+}
+@keyframes castPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(10, 132, 255, 0.5); }
+    50% { box-shadow: 0 0 30px rgba(10, 132, 255, 0.8); }
+}
+
+/* ============================================
+   PREMIUM CARD ANIMATIONS - Netflix/Disney+ Style
+   ============================================ */
+
+/* App Cards - Bouncy spring animations */
+.app-card {
+    width: 100%; 
+    height: var(--card-height); 
+    background: linear-gradient(145deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%);
+    border-radius: var(--radius-l); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    position: relative; 
+    overflow: hidden; 
+    border: 1px solid var(--glass-border);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.app-card:hover { 
+    transform: translateY(-6px) scale(1.02); 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.app-card:active { 
+    transform: scale(0.96) translateY(0) !important; 
+    transition-duration: 0.15s; 
+}
+
+.app-card.pressing { 
+    transform: scale(0.94); 
+    background: rgba(255,255,255,0.15); 
+    border-color: rgba(255,255,255,0.3); 
+}
+
+/* Add subtle glow on hover */
+.app-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    border-radius: var(--radius-l);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+}
+
+.app-card:hover::before {
+    opacity: 1;
+}
+
+/* ============================================
+   MOVIE CARD HOVER - Streaming App Style
+   ============================================ */
+
+.movie-card { 
+    border-radius: 16px; 
+    overflow: hidden; 
+    cursor: pointer; 
+    position: relative; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.movie-card:hover {
+    transform: translateY(-12px) scale(1.05);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+    z-index: 10;
+}
+
+.movie-card:active { 
+    transform: scale(0.96); 
+    transition-duration: 0.15s;
+}
+
+/* Shine effect on hover */
+.movie-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255,255,255,0.1) 50%,
+        transparent 70%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.movie-card:hover::after {
+    transform: translateX(100%);
+}
+
+/* ============================================
+   VIDEO PLAYER HEADER - Premium Glassmorphism
+   ============================================ */
+
+.iframe-header {
+    height: 60px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 20px; 
+    padding-top: var(--safe-top);
+    background: rgba(20, 20, 22, 0.95); 
+    backdrop-filter: blur(60px) saturate(180%); 
+    -webkit-backdrop-filter: blur(60px) saturate(180%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    z-index: 10;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+}
+
+.iframe-title { 
+    font-weight: 700; 
+    font-size: 16px; 
+    color: white; 
+    opacity: 0.95; 
+    letter-spacing: -0.3px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.iframe-controls {
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+}
+
+/* ============================================
+   VIDEO CONTROL BUTTONS - Premium Interactive
+   ============================================ */
+
+.win-btn { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    color: white; 
+    font-size: 1.1rem; 
+    cursor: pointer; 
+    background: rgba(255,255,255,0.08);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.win-btn:hover {
+    background: rgba(255,255,255,0.18);
+    transform: scale(1.12) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.win-btn:active {
+    transform: scale(0.92);
+    transition-duration: 0.1s;
+}
+
+.win-btn.close { 
+    background: rgba(255, 69, 58, 0.2); 
+    color: #ff453a; 
+    border-color: rgba(255, 69, 58, 0.3);
+}
+
+.win-btn.close:hover {
+    background: rgba(255, 69, 58, 0.4);
+    transform: scale(1.12) rotate(-5deg);
+    box-shadow: 0 6px 20px rgba(255, 69, 58, 0.4);
+}
+
+/* Cast button with pulse animation */
+.win-btn.cast {
+    background: rgba(10, 132, 255, 0.15);
+    color: var(--accent);
+}
+
+.win-btn.cast.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 25px rgba(10, 132, 255, 0.6);
+    animation: castPulse 2s infinite;
+}
+
+@keyframes castPulse {
+    0%, 100% { 
+        box-shadow: 0 0 25px rgba(10, 132, 255, 0.6);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 35px rgba(10, 132, 255, 0.9);
+        transform: scale(1.05);
+    }
+}
+
+/* ============================================
+   BRIGHTNESS CONTROL - Netflix Style Slider
+   ============================================ */
+
+.brightness-overlay {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    background: rgba(0,0,0,0); 
+    pointer-events: none;
+    z-index: 2999; 
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brightness-slider-container {
+    position: fixed; 
+    left: 24px; 
+    top: 50%; 
+    transform: translateY(-50%);
+    width: 44px; 
+    height: 300px; 
+    z-index: 3001;
+    display: none;
+}
+
+.iframe-container.active .brightness-slider-container {
+    display: flex;
+    animation: slideInLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideInLeft {
+    from { 
+        opacity: 0; 
+        transform: translateY(-50%) translateX(-30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(-50%) translateX(0); 
+    }
+}
+
+.brightness-slider-bg {
+    position: relative; 
+    width: 44px; 
+    height: 100%;
+    background: rgba(30, 30, 35, 0.9);
+    backdrop-filter: blur(40px) saturate(180%); 
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 100px;
+    box-shadow: 
+        0 10px 50px rgba(0,0,0,0.6), 
+        inset 0 0 0 1px rgba(255,255,255,0.12),
+        inset 0 2px 4px rgba(255,255,255,0.05);
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    padding: 18px 0;
+}
+
+.brightness-icon {
+    color: rgba(255,255,255,0.9); 
+    font-size: 1.2rem; 
+    margin-bottom: 14px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    animation: iconGlow 3s ease-in-out infinite;
+}
+
+@keyframes iconGlow {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+.brightness-track {
+    flex: 1; 
+    width: 8px; 
+    background: rgba(255,255,255,0.15);
+    border-radius: 100px; 
+    position: relative;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.brightness-fill {
+    position: absolute; 
+    bottom: 0; 
+    left: 0; 
+    right: 0;
+    background: linear-gradient(to top, 
+        var(--accent) 0%, 
+        rgba(10, 132, 255, 0.8) 50%,
+        rgba(255,255,255,0.9) 100%
+    );
+    border-radius: 100px;
+    transition: height 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px rgba(10, 132, 255, 0.5);
+}
+
+.brightness-thumb {
+    position: absolute; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 20px; 
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 
+        0 4px 16px rgba(0,0,0,0.5),
+        inset 0 1px 2px rgba(255,255,255,0.5);
+    cursor: grab;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.brightness-thumb:hover {
+    transform: translateX(-50%) scale(1.15);
+}
+
+.brightness-thumb:active {
+    cursor: grabbing;
+    transform: translateX(-50%) scale(1.25);
+    box-shadow: 
+        0 6px 20px rgba(0,0,0,0.6),
+        0 0 20px rgba(10, 132, 255, 0.5),
+        inset 0 1px 2px rgba(255,255,255,0.5);
+}
+
+/* ============================================
+   ADDITIONAL PREMIUM TOUCHES
+   ============================================ */
+
+/* Smooth page transitions */
+body {
+    transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced modal animations */
+.modal-window {
+    transform: scale(0.9) translateY(30px);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.active .modal-window {
+    transform: scale(1) translateY(0);
+}
+
+/* Buttons with micro-interactions */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Search input premium focus */
+.search-input {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input:focus {
+    transform: translateY(-2px);
+}
+/* ============================================
+   APPLE-GRADE NAVIGATION BAR
+   ============================================ */
+
+.orbit-nav {
+    position: fixed; 
+    top: calc(var(--safe-top) + 12px);
+    left: 50%; 
+    transform: translateX(-50%);
+    width: auto; 
+    min-width: 340px;
+    max-width: 900px;
+    background: rgba(29, 29, 31, 0.72); 
+    backdrop-filter: blur(80px) saturate(200%); 
+    -webkit-backdrop-filter: blur(80px) saturate(200%);
+    padding: 6px; 
+    border-radius: 100px; 
+    display: flex;
+    align-items: center; 
+    gap: 3px; 
+    z-index: 1000;
+    box-shadow: 
+        0 8px 32px rgba(0,0,0,0.35),
+        0 2px 8px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        inset 0 -1px 0 rgba(0,0,0,0.2);
+    transition: all 0.5s cubic-bezier(0.28, 0.11, 0.32, 1);
+    border: 0.5px solid rgba(255,255,255,0.12);
+}
+
+body.edit-mode .orbit-nav { 
+    opacity: 0; 
+    pointer-events: none; 
+    transform: translateX(-50%) translateY(-40px) scale(0.95); 
+}
+
+.nav-item {
+    padding: 11px 26px; 
+    border-radius: 100px; 
+    color: rgba(255,255,255,0.6);
+    font-size: 15px; 
+    font-weight: 590; 
+    cursor: pointer; 
+    transition: all 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+    position: relative;
+    letter-spacing: -0.2px;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 100px;
+    background: rgba(255,255,255,0);
+    transition: all 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+    z-index: -1;
+}
+
+.nav-item:hover:not(.active) {
+    color: rgba(255,255,255,0.85);
+}
+
+.nav-item:hover:not(.active)::before {
+    background: rgba(255,255,255,0.08);
+}
+
+.nav-item.active { 
+    color: rgba(255,255,255,0.98);
+}
+
+.nav-item.active::before {
+    background: rgba(255,255,255,0.18);
+    box-shadow: 
+        0 4px 16px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* ============================================
+   APPLE-STYLE IFRAME HEADER - Safari Inspired
+   ============================================ */
+
+.iframe-header {
+    height: 64px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 24px; 
+    padding-top: var(--safe-top);
+    background: rgba(28, 28, 30, 0.85); 
+    backdrop-filter: blur(120px) saturate(200%); 
+    -webkit-backdrop-filter: blur(120px) saturate(200%);
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    z-index: 10;
+    box-shadow: 
+        0 1px 0 rgba(255,255,255,0.05),
+        0 4px 24px rgba(0,0,0,0.15);
+}
+
+.iframe-title { 
+    font-weight: 600; 
+    font-size: 17px; 
+    color: rgba(255,255,255,0.98); 
+    letter-spacing: -0.4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    flex: 1;
+    text-align: center;
+}
+
+.iframe-controls {
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+}
+
+/* ============================================
+   APPLE-GRADE CONTROL BUTTONS
+   ============================================ */
+
+.win-btn { 
+    width: 36px; 
+    height: 36px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    color: white; 
+    font-size: 16px; 
+    cursor: pointer; 
+    background: rgba(255,255,255,0.1);
+    transition: all 0.25s cubic-bezier(0.28, 0.11, 0.32, 1);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    box-shadow: 
+        0 2px 8px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+}
+
+.win-btn:hover {
+    background: rgba(255,255,255,0.16);
+    transform: scale(1.08);
+    box-shadow: 
+        0 4px 16px rgba(0,0,0,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+.win-btn:active {
+    transform: scale(0.95);
+    transition-duration: 0.08s;
+    box-shadow: 
+        0 1px 4px rgba(0,0,0,0.2),
+        inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* macOS-style traffic light close button */
+.win-btn.close { 
+    background: linear-gradient(180deg, #FF5F57 0%, #FF4136 100%);
+    color: rgba(80,0,0,0.9); 
+    border: 0.5px solid rgba(0,0,0,0.15);
+    box-shadow: 
+        0 2px 8px rgba(255, 69, 58, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.3),
+        inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+
+.win-btn.close:hover {
+    background: linear-gradient(180deg, #FF6B63 0%, #FF4E44 100%);
+    box-shadow: 
+        0 4px 16px rgba(255, 69, 58, 0.5),
+        inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+.win-btn.close i {
+    color: rgba(80,0,0,0.95);
+    font-weight: 600;
+}
+
+/* Cast button - iOS blue */
+.win-btn.cast {
+    background: rgba(10, 132, 255, 0.12);
+    color: #0A84FF;
+    border-color: rgba(10, 132, 255, 0.2);
+}
+
+.win-btn.cast:hover {
+    background: rgba(10, 132, 255, 0.18);
+}
+
+.win-btn.cast.active {
+    background: linear-gradient(180deg, #0A84FF 0%, #0066CC 100%);
+    color: white;
+    box-shadow: 
+        0 4px 20px rgba(10, 132, 255, 0.5),
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.15);
+    animation: appleCastPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes appleCastPulse {
+    0%, 100% { 
+        box-shadow: 
+            0 4px 20px rgba(10, 132, 255, 0.5),
+            inset 0 1px 0 rgba(255,255,255,0.25);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 
+            0 6px 28px rgba(10, 132, 255, 0.7),
+            0 0 0 4px rgba(10, 132, 255, 0.1),
+            inset 0 1px 0 rgba(255,255,255,0.3);
+        transform: scale(1.04);
+    }
+}
+
+/* ============================================
+   APPLE-QUALITY CARDS
+   ============================================ */
+
+.app-card {
+    width: 100%; 
+    height: var(--card-height); 
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%);
+    border-radius: var(--radius-l); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    position: relative; 
+    overflow: hidden; 
+    border: 0.5px solid rgba(255,255,255,0.12);
+    transition: all 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+    box-shadow: 
+        0 4px 16px rgba(0,0,0,0.25),
+        0 8px 32px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.app-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.35s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+.app-card:hover { 
+    transform: translateY(-4px) scale(1.01); 
+    box-shadow: 
+        0 8px 32px rgba(0,0,0,0.35),
+        0 16px 48px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.16);
+}
+
+.app-card:hover::before {
+    opacity: 1;
+}
+
+.app-card:active { 
+    transform: scale(0.97); 
+    transition-duration: 0.08s;
+    box-shadow: 
+        0 2px 8px rgba(0,0,0,0.3),
+        inset 0 1px 2px rgba(0,0,0,0.15);
+}
+
+/* ============================================
+   MOVIE CARDS - Apple TV+ Style
+   ============================================ */
+
+.movie-card { 
+    border-radius: 18px; 
+    overflow: hidden; 
+    cursor: pointer; 
+    position: relative; 
+    box-shadow: 
+        0 8px 24px rgba(0,0,0,0.35),
+        0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+    border: 0.5px solid rgba(255,255,255,0.1);
+}
+
+.movie-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%);
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+    z-index: 1;
+}
+
+.movie-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 
+        0 20px 60px rgba(0,0,0,0.5),
+        0 8px 24px rgba(0,0,0,0.3);
+    border-color: rgba(255,255,255,0.15);
+}
+
+.movie-card:hover::before {
+    opacity: 1;
+}
+
+.movie-card:active { 
+    transform: scale(0.98); 
+    transition-duration: 0.08s;
+}
+
+/* ============================================
+   BRIGHTNESS SLIDER - iOS Style
+   ============================================ */
+
+.brightness-slider-bg {
+    position: relative; 
+    width: 46px; 
+    height: 100%;
+    background: rgba(28, 28, 30, 0.85);
+    backdrop-filter: blur(60px) saturate(180%); 
+    -webkit-backdrop-filter: blur(60px) saturate(180%);
+    border-radius: 100px;
+    box-shadow: 
+        0 8px 32px rgba(0,0,0,0.4),
+        0 2px 8px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        inset 0 -1px 0 rgba(0,0,0,0.3);
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    padding: 16px 0;
+    border: 0.5px solid rgba(255,255,255,0.12);
+}
+
+.brightness-track {
+    flex: 1; 
+    width: 6px; 
+    background: rgba(255,255,255,0.12);
+    border-radius: 100px; 
+    position: relative;
+    cursor: pointer;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.brightness-fill {
+    position: absolute; 
+    bottom: 0; 
+    left: 0; 
+    right: 0;
+    background: linear-gradient(to top, 
+        #0A84FF 0%, 
+        #5AC8FA 100%
+    );
+    border-radius: 100px;
+    transition: height 0.18s cubic-bezier(0.28, 0.11, 0.32, 1);
+    box-shadow: 0 0 16px rgba(10, 132, 255, 0.4);
+}
+
+.brightness-thumb {
+    position: absolute; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 18px; 
+    height: 18px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 3px 12px rgba(0,0,0,0.4),
+        0 1px 4px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+    cursor: grab;
+    transition: all 0.2s cubic-bezier(0.28, 0.11, 0.32, 1);
+    border: 0.5px solid rgba(0,0,0,0.1);
+}
+
+.brightness-thumb:hover {
+    transform: translateX(-50%) scale(1.12);
+    box-shadow: 
+        0 4px 16px rgba(0,0,0,0.5),
+        0 0 0 4px rgba(255,255,255,0.15);
+}
+
+.brightness-thumb:active {
+    cursor: grabbing;
+    transform: translateX(-50%) scale(1.18);
+    box-shadow: 
+        0 4px 20px rgba(0,0,0,0.6),
+        0 0 0 6px rgba(255,255,255,0.2);
+}
+
+/* ============================================
+   SEARCH BAR - Spotlight Style
+   ============================================ */
+
+.search-input {
+    width: 100%; 
+    padding: 13px 48px 13px 48px; 
+    border-radius: 22px;
+    border: 0.5px solid rgba(255,255,255,0.12); 
+    background: rgba(44, 44, 46, 0.6);
+    backdrop-filter: blur(40px) saturate(180%); 
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    color: white; 
+    font-size: 17px; 
+    outline: none; 
+    transition: all 0.3s cubic-bezier(0.28, 0.11, 0.32, 1);
+    box-shadow: 
+        0 4px 16px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    font-weight: 400;
+    letter-spacing: -0.2px;
+}
+
+.search-input:focus { 
+    background: rgba(58, 58, 60, 0.8); 
+    border-color: rgba(10, 132, 255, 0.5);
+    box-shadow: 
+        0 8px 32px rgba(0,0,0,0.3),
+        0 0 0 4px rgba(10, 132, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.search-input::placeholder {
+    color: rgba(255,255,255,0.4);
+    font-weight: 400;
+}
+
+/* ============================================
+   BUTTONS - SF Pro Inspired
+   ============================================ */
+
+.btn-primary {
+    background: linear-gradient(180deg, #0A84FF 0%, #0066CC 100%);
+    color: white;
+    box-shadow: 
+        0 4px 16px rgba(10, 132, 255, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.15);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(180deg, #1A8FFF 0%, #0070DD 100%);
+    box-shadow: 
+        0 6px 24px rgba(10, 132, 255, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.btn-primary:active {
+    background: linear-gradient(180deg, #0076E5 0%, #005BB8 100%);
+    box-shadow: 
+        0 2px 8px rgba(10, 132, 255, 0.3),
+        inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ============================================
+   MODALS - iOS Sheet Style
+   ============================================ */
+
+.modal-window {
+    background: rgba(28, 28, 30, 0.95); 
+    border-radius: 38px; 
+    padding: 28px; 
+    backdrop-filter: blur(80px) saturate(200%);
+    -webkit-backdrop-filter: blur(80px) saturate(200%);
+    box-shadow: 
+        0 40px 100px rgba(0,0,0,0.6),
+        0 12px 40px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        inset 0 -1px 0 rgba(0,0,0,0.3);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    transform: scale(0.92) translateY(40px);
+    transition: all 0.45s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+.modal-overlay.active .modal-window {
+    transform: scale(1) translateY(0);
+}
+
+/* ============================================
+   GLOBAL APPLE POLISH
+   ============================================ */
+
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    transition: background 1.2s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01s !important;
+        transition-duration: 0.01s !important;
+    }
+}
+/* ============================================
+   ELITE MARGINS - Apple Precision Spacing
+   ============================================ */
+
+/* Mobile: Comfortable breathing room */
+@media (max-width: 768px) {
+    .app-grid {
+        padding: 24px 20px !important;
+        gap: 24px 18px !important;
+    }
+    
+    .header-controls {
+        margin-top: 10px !important;
+        padding: 0 20px;
+        margin-bottom: 16px;
+    }
+    
+    .recents-container {
+        padding: 0 20px;
+        margin-bottom: 16px;
+    }
+    
+    .tmdb-section {
+        padding: 0 20px;
+        margin-bottom: 32px;
+    }
+    
+    .watchlist-controls {
+        padding: 0 20px;
+        margin-bottom: 20px;
+    }
+}
+
+/* Desktop: Premium spacious layout */
+@media (min-width: 768px) {
+    .app-grid { 
+        padding: 60px 48px !important;
+        gap: 64px 48px !important;
+    }
+    
+    .header-controls {
+        margin-top: 16px;
+        padding: 0 48px;
+        margin-bottom: 20px;
+    }
+    
+    .recents-container {
+        padding: 0 48px;
+        margin-bottom: 24px;
+    }
+    
+    .tmdb-section {
+        padding: 0 48px;
+        margin-bottom: 48px;
+    }
+    
+    .watchlist-controls {
+        padding: 0 48px;
+        margin-bottom: 28px;
+    }
+}
+
+/* Section titles - consistent spacing */
+.section-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 1.2px;
+    padding-left: 4px;
+}
+
+.recents-title {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-left: 4px;
+}
+
+/* Grid spacing within sections */
+.tmdb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 20px 16px;
+}
+
+.recents-scroll {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Better padding for body */
+body {
+    padding-top: calc(var(--safe-top) + 88px);
+    padding-bottom: calc(var(--safe-bottom) + 80px);
+}
+
+/* Modal spacing */
+.modal-window {
+    padding: 32px 28px;
+}
+
+.modal-title {
+    margin-bottom: 12px;
+}
+
+.modal-subtitle {
+    margin-bottom: 20px;
+}
+
+.btn-list {
+    gap: 14px;
+}
+
+/* Input groups spacing */
+.input-group {
+    margin-bottom: 18px;
+}
+
+/* Theme row spacing */
+.theme-row {
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.sort-row {
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
     </style>
 </head>
 <body>
@@ -494,19 +1533,21 @@
         <div class="nav-item" id="nav-watchlist" onclick="switchTab('watchlist')">List</div>
     </nav>
 
-    <!-- Header -->
+    <!-- Enhanced Header with Better Spacing -->
     <div class="header-controls">
-        <div class="header-btn" onclick="openSettings()"><i class="fa-solid fa-gear" id="settingsIcon"></i></div>
+        <div class="header-btn" onclick="openSettings()">
+            <i class="fa-solid fa-gear" id="settingsIcon"></i>
+        </div>
         <div class="search-wrapper">
             <i class="fa-solid fa-search search-icon"></i>
             <input type="text" class="search-input" id="searchInput" placeholder="Search..." onkeyup="handleSearch()">
-            <div class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></div>
+            <div class="search-clear" id="searchClear" onclick="clearSearch()">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
         </div>
-        
-        <!-- Battery Widget -->
-        <div class="header-battery" id="headerBattery" style="display:none; align-items:center; gap:6px;">
-            <span id="headerBatPercent" style="font-size:0.9rem; font-weight:600;">--%</span>
-            <i id="headerBatIcon" class="fa-solid fa-battery-full" style="font-size:1.1rem;"></i>
+        <div class="header-battery" id="headerBattery" style="display:none;">
+            <span id="headerBatPercent">--</span>
+            <i id="headerBatIcon" class="fa-solid fa-battery-full"></i>
         </div>
     </div>
 
@@ -536,14 +1577,41 @@
     <!-- Watchlist Grid -->
     <div class="app-grid" id="watchlistGrid" style="display: none;"></div>
 
-    <!-- Fluid Glass App Window (Desktop/Web fallback) -->
+    <!-- Premium Video Player Window -->
     <div class="iframe-container" id="iframeContainer">
         <div class="iframe-header">
-            <div class="win-btn close" onclick="closeWindow()"><i class="fa-solid fa-xmark"></i></div>
+            <!-- Left: Close button (macOS style) -->
+            <div class="win-btn close" onclick="closeWindow()">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+            
+            <!-- Center: Title -->
             <div class="iframe-title" id="winTitle">App</div>
-            <div class="win-btn" onclick="openExternal()"><i class="fa-regular fa-compass"></i></div>
+            
+            <!-- Right: Controls -->
+            <div class="iframe-controls">
+                <div class="win-btn cast" id="castBtn" onclick="toggleCast()" title="Cast to TV">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                </div>
+                <div class="win-btn" onclick="openExternal()" title="Open in Browser">
+                    <i class="fa-regular fa-compass"></i>
+                </div>
+            </div>
         </div>
-        <iframe id="appFrame" src=""></iframe>
+        
+        <!-- Brightness Slider (iOS Style) -->
+    <div class="brightness-slider-container">
+        <div class="brightness-slider-bg">
+            <i class="fa-solid fa-sun brightness-icon"></i>
+            <div class="brightness-track" id="brightnessTrack">
+                <div class="brightness-fill" id="brightnessFill"></div>
+                <div class="brightness-thumb" id="brightnessThumb"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="brightness-overlay" id="brightnessOverlay"></div>
+    <iframe id="appFrame" src=""></iframe>
     </div>
 
     <!-- Watch Options Modal -->
@@ -713,7 +1781,6 @@
                 </div>
                 <button class="btn btn-primary" onclick="finishOnboarding()">Finish Setup</button>
             </div>
-
         </div>
     </div>
 
@@ -829,6 +1896,7 @@
             if(!settings.searchEngine) settings.searchEngine = 'google';
             if(settings.bgUrl) document.body.style.backgroundImage = `url('${settings.bgUrl}')`;
         }
+        
         
         function updateBattery(bat) {
             const icon = document.getElementById('headerBatIcon');
@@ -1497,9 +2565,311 @@
         document.getElementById('confirmBtn').onclick = () => {
             if (confirmCallback) confirmCallback();
             closeConfirm();
-        };
-
+        }
         init();
+        
+ 
+        
+        // ========================================
+// BRIGHTNESS CONTROL - iOS Style
+// ========================================
+let brightness = 100;
+let isDraggingBrightness = false;
+
+function initBrightnessSlider() {
+    const track = document.getElementById('brightnessTrack');
+    const thumb = document.getElementById('brightnessThumb');
+    const fill = document.getElementById('brightnessFill');
+    const overlay = document.getElementById('brightnessOverlay');
+
+    if (!track || !thumb || !fill || !overlay) return;
+
+    function updateBrightness(clientY) {
+        const rect = track.getBoundingClientRect();
+        let percent = 100 - ((clientY - rect.top) / rect.height) * 100;
+        percent = Math.max(10, Math.min(100, percent));
+        brightness = percent;
+        
+        // Update UI
+        fill.style.height = percent + '%';
+        thumb.style.bottom = `calc(${percent}% - 9px)`;
+        
+        // Apply darkness overlay with smooth curve
+        const darkness = Math.pow((100 - percent) / 100, 1.5) * 0.75;
+        overlay.style.background = `rgba(0,0,0,${darkness})`;
+        
+        // Haptic feedback (if supported)
+        if (navigator.vibrate && percent % 10 === 0) {
+            navigator.vibrate(1);
+        }
+    }
+
+    // Mouse events
+    track.addEventListener('mousedown', (e) => {
+        isDraggingBrightness = true;
+        updateBrightness(e.clientY);
+        track.style.cursor = 'grabbing';
+    });
+
+    // Touch events
+    track.addEventListener('touchstart', (e) => {
+        isDraggingBrightness = true;
+        updateBrightness(e.touches[0].clientY);
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDraggingBrightness) {
+            updateBrightness(e.clientY);
+        }
+    });
+
+    document.addEventListener('touchmove', (e) => {
+        if (isDraggingBrightness) {
+            updateBrightness(e.touches[0].clientY);
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    document.addEventListener('mouseup', () => {
+        if (isDraggingBrightness) {
+            isDraggingBrightness = false;
+            track.style.cursor = 'pointer';
+        }
+    });
+
+    document.addEventListener('touchend', () => {
+        isDraggingBrightness = false;
+    });
+
+    // Initialize at 100%
+    fill.style.height = '100%';
+    thumb.style.bottom = 'calc(100% - 9px)';
+}
+
+// ========================================
+// CHROMECAST INTEGRATION - Apple Quality
+// ========================================
+let castSession = null;
+let isCastAvailable = false;
+
+function initCast() {
+    window['__onGCastApiAvailable'] = function(isAvailable) {
+        if (isAvailable) {
+            try {
+                cast.framework.CastContext.getInstance().setOptions({
+                    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+                });
+                
+                const context = cast.framework.CastContext.getInstance();
+                
+                // Listen for session state changes
+                context.addEventListener(
+                    cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+                    handleCastSessionChange
+                );
+                
+                isCastAvailable = true;
+                console.log('✓ Cast API initialized');
+            } catch (e) {
+                console.warn('Cast initialization failed:', e);
+            }
+        }
+    };
+}
+
+function handleCastSessionChange(event) {
+    const castBtn = document.getElementById('castBtn');
+    if (!castBtn) return;
+    
+    switch (event.sessionState) {
+        case cast.framework.SessionState.SESSION_STARTED:
+            castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+            castBtn.classList.add('active');
+            showToast('Connected to Cast device', 'success');
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            break;
+            
+        case cast.framework.SessionState.SESSION_ENDED:
+            castSession = null;
+            castBtn.classList.remove('active');
+            showToast('Cast disconnected', 'info');
+            break;
+    }
+}
+
+function toggleCast() {
+    if (!isCastAvailable) {
+        showToast('Chromecast not available', 'error');
+        return;
+    }
+
+    const context = cast.framework.CastContext.getInstance();
+    
+    if (castSession) {
+        // End current session with smooth transition
+        context.endCurrentSession(true);
+    } else {
+        // Request new session
+        context.requestSession().then(
+            () => {
+                console.log('Cast session started');
+            },
+            (error) => {
+                if (error !== 'cancel') {
+                    console.error('Cast error:', error);
+                    showToast('Failed to connect to Cast device', 'error');
+                }
+            }
+        );
+    }
+}
+
+// ========================================
+// TOAST NOTIFICATIONS - Apple Style
+// ========================================
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    
+    const icon = type === 'success' ? 'fa-check-circle' : 
+                 type === 'error' ? 'fa-exclamation-circle' : 
+                 'fa-info-circle';
+    
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+    toast.classList.add('active');
+    
+    setTimeout(() => {
+        toast.classList.remove('active');
+    }, 3000);
+}
+
+// ========================================
+// ENHANCED WINDOW MANAGEMENT
+// ========================================
+function openWindow(app) {
+    addToRecents(app);
+    currentActiveAppUrl = app.url;
+    
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+
+    if (isNative || settings.forceExternal) {
+        try {
+            if (isNative) {
+                Capacitor.Plugins.Browser.open({ 
+                    url: app.url, 
+                    toolbarColor: '#1C1C1E', 
+                    presentationStyle: 'fullscreen' 
+                });
+            } else {
+                window.open(app.url, '_blank');
+            }
+            return;
+        } catch (e) {
+            window.open(app.url, '_blank');
+            return;
+        }
+    }
+    
+    // Set title with smooth transition
+    const titleEl = document.getElementById('winTitle');
+    titleEl.style.opacity = '0';
+    setTimeout(() => {
+        titleEl.innerText = app.name;
+        titleEl.style.opacity = '1';
+    }, 150);
+    
+    // Reset brightness to 100%
+    brightness = 100;
+    document.getElementById('brightnessFill').style.height = '100%';
+    document.getElementById('brightnessThumb').style.bottom = 'calc(100% - 9px)';
+    document.getElementById('brightnessOverlay').style.background = 'rgba(0,0,0,0)';
+    
+    // Load iframe
+    document.getElementById('appFrame').src = app.url;
+    document.getElementById('iframeContainer').classList.add('active');
+    
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(10);
+}
+
+function closeWindow() {
+    const container = document.getElementById('iframeContainer');
+    container.classList.remove('active');
+    
+    // Clear iframe after animation
+    setTimeout(() => {
+        document.getElementById('appFrame').src = '';
+    }, 400);
+    
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(5);
+}
+
+// ========================================
+// SMOOTH TAB SWITCHING
+// ========================================
+function switchTab(tab) {
+    currentTab = tab;
+    
+    // Update nav with smooth transition
+    document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+    });
+    document.getElementById(`nav-${tab === 'all' ? 'home' : tab}`).classList.add('active');
+
+    // Theme color for settings icon
+    const settingsIcon = document.getElementById('settingsIcon');
+    const colors = {
+        home: 'var(--theme-home)',
+        video: 'var(--theme-video)',
+        music: 'var(--theme-music)',
+        watchlist: 'var(--theme-list)'
+    };
+    settingsIcon.style.color = colors[tab] || 'var(--accent)';
+    
+    // Handle grid visibility
+    const appGrid = document.getElementById('appGrid');
+    const watchGrid = document.getElementById('watchlistGrid');
+    const tmdb = document.getElementById('tmdbSection');
+    const wlControls = document.getElementById('watchlistControls');
+
+    tmdb.classList.remove('active');
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClear').classList.remove('visible');
+    document.body.classList.remove('is-searching');
+    
+    if (isEditMode) disableEditMode();
+
+    if (tab === 'watchlist') {
+        appGrid.style.display = 'none';
+        watchGrid.style.display = 'grid';
+        wlControls.style.display = 'flex';
+        renderWatchlist();
+    } else {
+        appGrid.style.display = 'grid';
+        watchGrid.style.display = 'none';
+        wlControls.style.display = 'none';
+        renderGrid();
+    }
+    
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(5);
+}
+
+// ========================================
+// INITIALIZE ALL PREMIUM FEATURES
+// ========================================
+window.addEventListener('load', () => {
+    initBrightnessSlider();
+    initCast();
+    
+    // Add smooth scrolling
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    console.log('✓ ORBIT Premium initialized');
+});
     </script>
 </body>
 </html>
